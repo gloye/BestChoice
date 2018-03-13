@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 
-function getQues(props){
+function Ques(props){
     if(!props.completed){
         return(
             <div>
@@ -16,19 +16,39 @@ function getQues(props){
         return(
             <div>
                 <h3>第1题 是否经常阅读</h3>
+                <Choice/>
             </div>
         )
     }
 }
 
-function getRes(){
+function Choice(props){
+    let isShow = false
+    const handleFocus = (e) => {
+        console.log(e)
+        isShow = true
+        console.log(isShow)
+    }
+    
     return(
         <div style={{display:"inline"}}>
-            <input type="text" placeholder="是" onFocus={props.handleFocus}/>
-            <input type="text" placeholder="Kindle"/>
-            <button>下一题</button>
+            <input type="text" placeholder="是" onFocus={handleFocus}/>
+            <Res focus={isShow}/>
         </div>
     )
+}
+
+function Res(props){
+    if(props.focus){
+        return(
+            <div style={{display:"inline"}}>
+                <input type="text" placeholder="Kindle"/>
+                <button>下一题</button>
+            </div>
+        )
+    }else{
+        return null
+    }
 }
 
 
@@ -55,7 +75,7 @@ class QuestionInput extends Component {
         return (
             <div className="question-item">
                 <h1>如何选择一个Kindle?</h1>
-                {getQues(state)}
+                {Ques(state)}
             </div>
         )
     }
