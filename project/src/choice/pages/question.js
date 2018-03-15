@@ -16,7 +16,8 @@ function Ques(props) {
     return (
       <div>
         <h3>第1题 是否经常阅读</h3>
-        <Choice handleFocus={props.handleFocus} isFocus={props.isFocus} />
+        <Choice handleFocus={()=>{props.handleFocus(0)}} cancelFocus={props.cancelFocus} isFocus={props.isFocus===0} val='是' />
+        <Choice handleFocus={()=>{props.handleFocus(1)}} cancelFocus={props.cancelFocus} isFocus={props.isFocus===1} val='否' />
       </div>
     );
   }
@@ -24,13 +25,14 @@ function Ques(props) {
 
 function Choice(props) {
   return (
-    <div style={{ display: "inline" }}>
+    <div>
       <input
         type="text"
-        placeholder="是"
+        placeholder={props.val}
         onFocus={e => {
           props.handleFocus(e);
         }}
+        onBlur={(e)=>{props.cancelFocus(e)}}
       />
       <Res isFocus={props.isFocus} />
     </div>
@@ -41,7 +43,7 @@ function Res(props) {
   if (props.isFocus) {
     return (
       <div style={{ display: "inline" }}>
-        <input type="text" placeholder="Kindle" />
+        <input type="text" placeholder='Kindle' value={props.res} />
         <button>下一题</button>
       </div>
     );
@@ -57,28 +59,37 @@ class QuestionInput extends Component {
     const handleFocus = this.handleFocus.bind(this)
     const handleSubmit = this.handleSubmit.bind(this)
     const handleInput = this.handleInput.bind(this)
+    const cancelFocus = this.cancelFocus.bind(this)
     this.state = {
-      completed: false,
-      isFocus: false,
+      completed: true,
+      isFocus: -1,
       handleFocus,
       handleSubmit,
-      handleInput
+      handleInput,
+      cancelFocus
     };
   }
-  handleFocus(e) {
-    this.setState({
-      isFocus: true
-    });
+  /* 获取焦点 */
+  handleFocus(idx) {
+    this.setState({isFocus:idx})
   }
+  /* 离开焦点 */
+  cancelFocus(e){
+    console.log(e.target)
+    // this.setState({isFocus:-1})
+  }
+  /* 提交 */
   handleSubmit(e) {
     e.preventDefault()
     this.setState({
       completed: true
     });
   }
+  /* 输入 */
   handleInput(e){
     console.log(e.target.value)
   }
+
   render() {
     const state = this.state;
     return (
