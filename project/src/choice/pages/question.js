@@ -69,14 +69,13 @@ class QuestionInput extends Component {
       cancelFocus
     };
   }
-  /* 获取焦点 */
+  /* focus事件 */
   handleFocus(idx) {
     this.setState({isFocus:idx})
   }
-  /* 离开焦点 */
+  /* blur事件 */
   cancelFocus(e){
     console.log(e.target)
-    // this.setState({isFocus:-1})
   }
   /* 提交 */
   handleSubmit(e) {

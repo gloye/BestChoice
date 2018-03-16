@@ -1,6 +1,5 @@
 import React, { PureComponent } from 'react'
-// import Title from './pages/title'
-import Question from './pages/question'
+import { BrowserRouter as Router, Route, Link } from 'react-router-dom'
 
 class App extends PureComponent {
     constructor() {
@@ -53,7 +52,9 @@ class App extends PureComponent {
     render(){
         return (
             <div>
-                <Question index={1}/>
+                <Router>
+                    <Link to="/topic"> 创建问卷 </Link>
+                </Router>
             </div>
         )
     }
