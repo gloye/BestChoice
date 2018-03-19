@@ -1,4 +1,5 @@
 import React, { PureComponent } from "react";
+import _ from 'lodash'
 import { BrowserRouter as Router, Route, Link } from "react-router-dom";
 
 import Topic from "./pages/topic";
@@ -8,7 +9,9 @@ import Choice from "./pages/choice";
 class App extends PureComponent {
   constructor() {
     super();
+    this.createApp = this.createApp.bind(this)
     this.state = {
+      currentItem:null,
       item: {
         title: "Kindle",
         children: [
@@ -66,14 +69,27 @@ class App extends PureComponent {
       }
     };
   }
+  /* 新建一个项目 */
+  createApp(){
+    this.setState({
+      currentItem:{}
+    })
+  }
+  /* 新建一个主题 */
+  createTitle(title){
+    const {currentItem} = this.state
+    if(!_.isPlainObject(currentItem)) return
+    currentItem.title = title
+    this.setState({currentItem})
+  }
   render() {
     return (
       <Router>
         <div>
-          <Link to="/topic">创建问卷</Link>
+          <Link to="/topic" onClick={this.createApp}>创建问卷</Link>
           <Route exact path="/topic" component={Topic} />
-          <Route exact path="/question/:id" component={Question} />
-          <Route exact path="/choice/:id" component={Choice} />
+          <Route exact path="/question" component={Question} />
+          <Route exact path="/choice" component={Choice} />
         </div>
       </Router>
     );
