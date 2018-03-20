@@ -3,40 +3,38 @@ import React, { PureComponent } from "react";
 class Topic extends PureComponent {
   constructor(props) {
     super(props);
-    this.state = {
-      title: ""
-    };
     this.handleTitleChange = this.handleTitleChange.bind(this);
-    this.handleTitleSubmit = this.handleTitleSubmit.bind(this);
+    this.state = {
+      title: null
+    };
   }
   handleTitleChange(e) {
     const title = e.target.value;
     this.setState({
-      title: title
-    });
-  }
-  handleTitleSubmit(e){
-      e.preventDefault()
-      this.props.history.push('/question/1')
+      title
+    })
   }
   render() {
+    const title = this.state.title
     return (
-      <form onSubmit={this.handleSubmit}>
-        <div className="form-group">
-          <label htmlFor="title">输入标题:</label>
-          <input
-            type="text"
-            name="title"
-            id=""
-            onChange={this.handleTitleChange}
-            placeholder="请输入你的标题"
-          />
-          <button
-            onClick={this.handleTitleSubmit}>
-            下一步
-          </button>
-        </div>
-      </form>
+      <div className="form-group">
+        <label htmlFor="title">输入标题:</label>
+        <input
+          type="text"
+          name="title"
+          id="title"
+          onChange={this.handleTitleChange}
+          placeholder="请输入你的标题"
+        />
+        <button
+          onClick={(event) => {
+            this.props.history.push("/question")
+            this.props.createTitle(title);
+          }}
+        >
+          下一步
+        </button>
+      </div>
     );
   }
 }

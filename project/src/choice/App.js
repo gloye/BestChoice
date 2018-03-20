@@ -80,14 +80,18 @@ class App extends PureComponent {
     const {currentItem} = this.state
     if(!_.isPlainObject(currentItem)) return
     currentItem.title = title
-    this.setState({currentItem})
+    this.setState(currentItem)
   }
   render() {
     return (
       <Router>
         <div>
-          <Link to="/topic" onClick={this.createApp}>创建问卷</Link>
-          <Route exact path="/topic" component={Topic} />
+          <ul>
+            <li><Link to="/">返回首页</Link></li>
+            <li><Link to="/topic" onClick={this.createApp}>创建问卷</Link></li>
+          </ul>
+          <hr/>
+          <Route exact path="/topic" render={(props)=><Topic createTitle={title=>this.createTitle(title)} {...props}/>}/>
           <Route exact path="/question" component={Question} />
           <Route exact path="/choice" component={Choice} />
         </div>
