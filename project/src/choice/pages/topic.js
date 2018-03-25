@@ -28,8 +28,12 @@ class Topic extends PureComponent {
         />
         <button
           onClick={(event) => {
-            this.props.history.push("/question")
-            this.props.createTitle(title);
+            if(typeof title === 'string' && title.trim()){
+              this.props.history.push("/question")
+              this.props.createTitle(title);
+            }else{
+              alert("请填写标题！")
+            }
           }}
         >
           下一步

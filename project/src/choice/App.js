@@ -92,7 +92,7 @@ class App extends PureComponent {
           </ul>
           <hr/>
           <Route exact path="/topic" render={(props)=><Topic createTitle={title=>this.createTitle(title)} {...props}/>}/>
-          <Route exact path="/question" component={Question} />
+          <Route exact path="/question" render={(props)=><Question topicTitle={this.state.currentItem.title} {...props}/>} />
           <Route exact path="/choice" component={Choice} />
         </div>
       </Router>

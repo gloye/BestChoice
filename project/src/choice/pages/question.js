@@ -93,7 +93,7 @@ class QuestionInput extends Component {
     const state = this.state;
     return (
       <div className="question-item">
-        <h1>如何选择一个Kindle?</h1>
+        <h1>{this.props.topicTitle}</h1>
         <Ques {...state} />
       </div>
     );
