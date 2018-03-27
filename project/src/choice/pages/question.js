@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 
-function Ques(props) {
+function QuestionItem(props) {
   if (!props.completed) {
     return (
       <div>
@@ -15,7 +15,7 @@ function Ques(props) {
   } else {
     return (
       <div>
-        <h3>第1题 是否经常阅读</h3>
+        <h3>第1题 {props.title} </h3>
         <Choice handleFocus={()=>{props.handleFocus(0)}} cancelFocus={props.cancelFocus} isFocus={props.isFocus===0} val='是' />
         <Choice handleFocus={()=>{props.handleFocus(1)}} cancelFocus={props.cancelFocus} isFocus={props.isFocus===1} val='否' />
       </div>
@@ -53,7 +53,7 @@ function Res(props) {
 }
 
 /* 然后开始建第一个选项 */
-class QuestionInput extends Component {
+class Question extends Component {
   constructor(props) {
     super(props);
     const handleFocus = this.handleFocus.bind(this)
@@ -61,8 +61,9 @@ class QuestionInput extends Component {
     const handleInput = this.handleInput.bind(this)
     const cancelFocus = this.cancelFocus.bind(this)
     this.state = {
-      completed: true,
+      completed: false,
       isFocus: -1,
+      title:null,
       handleFocus,
       handleSubmit,
       handleInput,
@@ -86,7 +87,8 @@ class QuestionInput extends Component {
   }
   /* 输入 */
   handleInput(e){
-    console.log(e.target.value)
+    const title = e.target.value
+    this.setState({title})
   }
 
   render() {
@@ -94,10 +96,10 @@ class QuestionInput extends Component {
     return (
       <div className="question-item">
         <h1>{this.props.topicTitle}</h1>
-        <Ques {...state} />
+        <QuestionItem {...state} />
       </div>
     );
   }
 }
 
-export default QuestionInput;
+export default Question;
