@@ -4,7 +4,7 @@ function QuestionItem(props) {
   if (!props.completed) {
     return (
       <div>
-        <h3>第1题</h3>
+        <h3>第{props.index}题</h3>
         <div className="form-group">
           <label htmlFor="#input"> 请输入你的问题：</label>
           <input id="input" type="text" className="form-control" onChange={(e)=>{props.handleInput(e)}}/>
@@ -15,9 +15,9 @@ function QuestionItem(props) {
   } else {
     return (
       <div>
-        <h3>第1题 {props.title} </h3>
-        <Choice handleFocus={()=>{props.handleFocus(0)}} cancelFocus={props.cancelFocus} isFocus={props.isFocus===0} val='是' />
-        <Choice handleFocus={()=>{props.handleFocus(1)}} cancelFocus={props.cancelFocus} isFocus={props.isFocus===1} val='否' />
+        <h3>第{props.index}题 {props.title} </h3>
+        <Choice handleFocus={()=>{props.handleFocus(0)}} cancelFocus={props.cancelFocus} isFocus={props.isFocus===0} click={props.handleNextClick} val='是' />
+        <Choice handleFocus={()=>{props.handleFocus(1)}} cancelFocus={props.cancelFocus} isFocus={props.isFocus===1} click={props.handleNextClick} val='否' />
       </div>
     );
   }
@@ -34,7 +34,7 @@ function Choice(props) {
         }}
         onBlur={(e)=>{props.cancelFocus(e)}}
       />
-      <Res isFocus={props.isFocus} />
+      <Res isFocus={props.isFocus} click={props.click} />
     </div>
   );
 }
@@ -44,7 +44,7 @@ function Res(props) {
     return (
       <div style={{ display: "inline" }}>
         <input type="text" placeholder='Kindle' value={props.res} />
-        <button>下一题</button>
+        <button onClick={e=>{props.click(e)}}>下一题</button>
       </div>
     );
   } else {
@@ -59,15 +59,19 @@ class Question extends Component {
     const handleFocus = this.handleFocus.bind(this)
     const handleSubmit = this.handleSubmit.bind(this)
     const handleInput = this.handleInput.bind(this)
+    const handleNextClick =  this.handleNextClick.bind(this)
     const cancelFocus = this.cancelFocus.bind(this)
+
     this.state = {
       completed: false,
       isFocus: -1,
       title:null,
+      index:1,
       handleFocus,
       handleSubmit,
       handleInput,
-      cancelFocus
+      cancelFocus,
+      handleNextClick
     };
   }
   /* focus事件 */
@@ -91,12 +95,24 @@ class Question extends Component {
     this.setState({title})
   }
 
+  /* 下一题 */
+  handleNextClick(e){
+    let {index} = this.state
+    index+=1
+    this.setState({index})
+  }
+
   render() {
     const state = this.state;
+    const {index} = this.state
+    const questions = []
+    for(let i = 0;i<index;i++){
+      questions.push(<QuestionItem {...state} />)
+    }
     return (
       <div className="question-item">
         <h1>{this.props.topicTitle}</h1>
-        <QuestionItem {...state} />
+        {questions}
       </div>
     );
   }
