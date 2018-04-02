@@ -12,61 +12,6 @@ class App extends PureComponent {
     this.createApp = this.createApp.bind(this);
     this.state = {
       currentItem: null,
-      item: {
-        title: "Kindle",
-        children: [
-          {
-            title: "是否经常阅读",
-            id: 1,
-            children: [
-              {
-                title: "是",
-                target: 2
-              },
-              {
-                title: "否",
-                target: 101
-              }
-            ]
-          },
-          {
-            title: "常阅读什么书",
-            id: 2,
-            children: [
-              {
-                title: "工具书,教材",
-                target: 101
-              },
-              {
-                title: "小说,文学",
-                target: 3
-              }
-            ]
-          }
-        ],
-        choices: [
-          {
-            title: "平板电脑",
-            id: 101
-          },
-          {
-            title: "入门版",
-            id: 102
-          },
-          {
-            title: "Paperwhite",
-            id: 103
-          },
-          {
-            title: "Voyage",
-            id: 104
-          },
-          {
-            title: "Oasis 2",
-            id: 105
-          }
-        ]
-      }
     };
   }
   /* 新建一个项目 */
@@ -97,6 +42,22 @@ class App extends PureComponent {
     currentItem.children = children
     this.setState(currentItem)
   }
+
+  /* 新建一个答案 */
+  createAnswer(answer){
+    const {currentItem} = this.state
+    let {choices} = currentItem
+    if (!_.isArray(choices)) {
+      choices = [];
+    }
+    const choice = {
+      title: answer,
+      id: choices.length + 100
+    };
+    currentItem.choices = choices
+    this.setState(currentItem)
+  }
+
   render() {
     return (
       <Router>
@@ -121,7 +82,7 @@ class App extends PureComponent {
                 {...props}
               />
             )}
-          />  
+          />
           <Route
             exact
             path="/question"
