@@ -59,6 +59,7 @@ class Question extends Component {
     const handleFocus = this.handleFocus.bind(this)
     const handleSubmit = this.handleSubmit.bind(this)
     const handleInput = this.handleInput.bind(this)
+    const createQuestion = (value)=>{ props.createQuestion(value)}
     const handleNextClick =  this.handleNextClick.bind(this)
     const cancelFocus = this.cancelFocus.bind(this)
 
@@ -71,7 +72,8 @@ class Question extends Component {
       handleSubmit,
       handleInput,
       cancelFocus,
-      handleNextClick
+      handleNextClick,
+      createQuestion
     };
   }
   /* focus事件 */
@@ -85,6 +87,8 @@ class Question extends Component {
   /* 提交 */
   handleSubmit(e) {
     e.preventDefault()
+    const {title,createQuestion} = this.state
+    createQuestion(title)
     this.setState({
       completed: true
     });
@@ -107,7 +111,7 @@ class Question extends Component {
     const {index} = this.state
     const questions = []
     for(let i = 0;i<index;i++){
-      questions.push(<QuestionItem {...state} />)
+      questions.push(<QuestionItem {...state} key={i} />)
     }
     return (
       <div className="question-item">

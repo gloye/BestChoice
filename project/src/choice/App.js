@@ -14,6 +14,17 @@ class App extends PureComponent {
       currentItem: null,
     };
   }
+
+  componentWillMount = () => {
+    // 读取本地存储
+    const currentItem = JSON.parse(localStorage.getItem('currentItem'))
+    if(!!currentItem){
+      this.setState({
+        currentItem
+      })
+    }
+  }
+  
   /* 新建一个项目 */
   createApp() {
     this.setState({
@@ -25,7 +36,8 @@ class App extends PureComponent {
     const { currentItem } = this.state;
     if (!_.isPlainObject(currentItem)) return;
     currentItem.title = title;
-    this.setState(currentItem);
+    this.setState({currentItem});
+    localStorage.setItem('currentItem',JSON.stringify(currentItem))
   }
 
   /* 新建一个问题 */
@@ -39,8 +51,10 @@ class App extends PureComponent {
       title: question,
       id: children.length
     };
+    children.push(child)
     currentItem.children = children
-    this.setState(currentItem)
+    this.setState({currentItem:currentItem})
+    // localStorage.setItem('currentItem',JSON.stringify(currentItem))
   }
 
   /* 新建一个答案 */
@@ -54,8 +68,10 @@ class App extends PureComponent {
       title: answer,
       id: choices.length + 100
     };
+    choices.push(choice)
     currentItem.choices = choices
     this.setState(currentItem)
+    localStorage.setItem('currentItem',JSON.stringify(currentItem))
   }
 
   render() {
@@ -87,7 +103,9 @@ class App extends PureComponent {
             exact
             path="/question"
             render={props => (
-              <Question topicTitle={this.state.currentItem.title} {...props} />
+              <Question 
+              topicTitle={this.state.currentItem.title} 
+              createQuestion={(e)=>{this.createQuestion(e)}} {...props} />
             )}
           />
           <Route exact path="/choice" component={Choice} />
