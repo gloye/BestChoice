@@ -1,13 +1,16 @@
 import React, { Component } from "react";
 
 function QuestionItem(props) {
+  const Choices = []
+  props.children.forEach(item=>{
+      Choices.push(<Choice val={item.title} {...props}/>)
+  })
   return (
     <div className="item">
       <h3>
         第{props.index + 1}题 {props.title}
       </h3>
-      <Choice val="是" handleFocus={props.handleFocus}/>
-      <Choice val="否" handleFocus={props.handleFocus}/>
+      {Choices}
     </div>
   );
 }
@@ -21,7 +24,7 @@ function QuestionAdd(props) {
         <input
           id="input"
           type="text"
-          className="form-control"
+          className="questionInput"
           onChange={e => {
             props.handleInput(e);
           }}
@@ -44,7 +47,14 @@ function Choice(props) {
   ) : null;
   return (
     <div>
-      <input type="text" placeholder={props.val} onFocus={props.handleFocus} />
+      <input
+        type="text"
+        className="optionInput"
+        placeholder={props.val}
+        value = {props.val}
+        onFocus={props.handleFocus}
+        onChange = {(e)=>{props.handleInput(e)}}
+      />
       {resultInput}
     </div>
   );
@@ -58,24 +68,35 @@ class Question extends Component {
       props.createQuestion(value);
     };
     this.state = {
+      title: null,
+      options: [null, null],
+      currentInputClass: null,
       createQuestion
     };
   }
 
   /* focus事件 */
   handleFocus(e) {
-    console.log('focus')
-  }
-
-  /* 输入 */
-  handleInput(e) {
-    const title = e.target.value;
-    this.setState({ title });
+  
   }
 
   /* blur事件 */
-  handleBlur(e) {
-    
+  handleBlur(e) {}
+
+  /* 输入 */
+  handleInput(e) {
+    const that = this
+    const {className} = e.target
+    switch (className) {
+      case "questionInput":
+        const title = e.target.value;
+        that.setState({title})
+        break;
+      case "optionInput":
+        break;
+      default:
+        return null
+    }
   }
 
   /* 提交 */
@@ -89,20 +110,26 @@ class Question extends Component {
     const { title, children } = this.props.currentItem;
     const questions = [];
     const nextIndex = children ? children.length + 1 : 1;
-    const handleFocus = this.handleFocus.bind(this)
+    const handleFocus = this.handleFocus.bind(this);
+    const handleInput = this.handleInput.bind(this);
+    const handleSubmit = this.handleSubmit.bind(this);
     const events = {
-      handleFocus
-    }
+      handleFocus,
+      handleInput,
+      handleSubmit
+    };
     if (children) {
       children.forEach((item, index) => {
-        questions.push(<QuestionItem {...item} {...events} index={index} key={item.id} />);
+        questions.push(
+          <QuestionItem {...item} {...events} index={index} key={item.id} />
+        );
       });
     }
     return (
       <div className="question-item">
-        <h1>{title}</h1>
+        <h1>{title ? title : "尚未定义主题"}</h1>
         {questions}
-        <QuestionAdd index={nextIndex} />
+        <QuestionAdd index={nextIndex} {...events} />
       </div>
     );
   }

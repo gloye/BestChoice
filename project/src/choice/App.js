@@ -1,14 +1,14 @@
 import React, { PureComponent } from "react";
 import _ from "lodash";
-import { BrowserRouter as Router, Route, Link } from "react-router-dom";
+import { BrowserRouter as Router, Route, Link, Switch } from "react-router-dom";
 
 import Topic from "./pages/topic";
 import Question from "./pages/question";
 import Choice from "./pages/choice";
 
 class App extends PureComponent {
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
     this.createApp = this.createApp.bind(this);
     this.state = {
       currentItem: null
@@ -22,15 +22,19 @@ class App extends PureComponent {
       this.setState({
         currentItem
       });
+    } else {
+      this.createApp();
     }
   };
 
   /* 新建一个项目 */
   createApp() {
+    localStorage.removeItem('currentItem')
     this.setState({
       currentItem: {}
     });
   }
+
   /* 新建一个主题 */
   createTitle(title) {
     const currentItem = _.cloneDeep(this.state.currentItem);
@@ -49,7 +53,15 @@ class App extends PureComponent {
     }
     const child = {
       title: question,
-      id: children.length
+      id: children.length,
+      children: [
+        {
+          title: "是"
+        },
+        {
+          title: "否"
+        }
+      ]
     };
     children.push(child);
     currentItem.children = children;
@@ -75,47 +87,37 @@ class App extends PureComponent {
   }
 
   render() {
-    const nav = () => {
-      return (
-        <ul>
-          <li>
-            <Link to="/">返回首页</Link>
-          </li>
-          <li>
-            <Link to="/topic" onClick={this.createApp}>
-              创建问卷
-            </Link>
-          </li>
-        </ul>
-      );
-    };
+    const Nav = () => <Link to="/topic" onClick={this.createApp}>创建问卷</Link>;
+    const NotFound = () => <h1>404 Not Found</h1>;
     return (
       <Router>
         <div>
-          <Route
-            exact
-            path="/topic"
-            render={props => (
-              <Topic
-                createTitle={title => this.createTitle(title)}
-                {...props}
-              />
-            )}
-          />
-          <Route
-            exact
-            path="/question"
-            render={props => (
-              <Question
-                currentItem={this.state.currentItem}
-                createQuestion={e => {
-                  this.createQuestion(e);
-                }}
-                {...props}
-              />
-            )}
-          />
-          <Route exact path="/choice" component={Choice} />
+          <Switch>
+            <Route
+              path="/topic"
+              render={props => (
+                <Topic
+                  createTitle={title => this.createTitle(title)}
+                  {...props}
+                />
+              )}
+            />
+            <Route
+              path="/question"
+              render={props => (
+                <Question
+                  currentItem={this.state.currentItem}
+                  createQuestion={e => {
+                    this.createQuestion(e);
+                  }}
+                  {...props}
+                />
+              )}
+            />
+            <Route path="/choice" component={Choice} />
+            <Route exact path="/" component={Nav} />
+            <Route component={NotFound} />
+          </Switch>
         </div>
       </Router>
     );
