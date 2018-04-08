@@ -1,122 +1,108 @@
 import React, { Component } from "react";
 
 function QuestionItem(props) {
-  if (!props.completed) {
-    return (
-      <div>
-        <h3>第{props.index}题</h3>
-        <div className="form-group">
-          <label htmlFor="#input"> 请输入你的问题：</label>
-          <input id="input" type="text" className="form-control" onChange={(e)=>{props.handleInput(e)}}/>
-          <button onClick={(e)=>{props.handleSubmit(e)}}>确定</button>
-        </div>
-      </div>
-    );
-  } else {
-    return (
-      <div>
-        <h3>第{props.index}题 {props.title} </h3>
-        <Choice handleFocus={()=>{props.handleFocus(0)}} cancelFocus={props.cancelFocus} isFocus={props.isFocus===0} click={props.handleNextClick} val='是' />
-        <Choice handleFocus={()=>{props.handleFocus(1)}} cancelFocus={props.cancelFocus} isFocus={props.isFocus===1} click={props.handleNextClick} val='否' />
-      </div>
-    );
-  }
-}
-
-function Choice(props) {
   return (
-    <div>
-      <input
-        type="text"
-        placeholder={props.val}
-        onFocus={e => {
-          props.handleFocus(e);
-        }}
-        onBlur={(e)=>{props.cancelFocus(e)}}
-      />
-      <Res isFocus={props.isFocus} click={props.click} />
+    <div className="item">
+      <h3>
+        第{props.index + 1}题 {props.title}
+      </h3>
+      <Choice val="是" handleFocus={props.handleFocus}/>
+      <Choice val="否" handleFocus={props.handleFocus}/>
     </div>
   );
 }
 
-function Res(props) {
-  if (props.isFocus) {
-    return (
-      <div style={{ display: "inline" }}>
-        <input type="text" placeholder='Kindle' value={props.res} />
-        <button onClick={e=>{props.click(e)}}>下一题</button>
+function QuestionAdd(props) {
+  return (
+    <div>
+      <h3>第{props.index}题</h3>
+      <div className="form-group">
+        <label htmlFor="#input"> 请输入你的问题：</label>
+        <input
+          id="input"
+          type="text"
+          className="form-control"
+          onChange={e => {
+            props.handleInput(e);
+          }}
+        />
+        <button
+          onClick={e => {
+            props.handleSubmit(e);
+          }}
+        >
+          确定
+        </button>
       </div>
-    );
-  } else {
-    return null;
-  }
+    </div>
+  );
+}
+
+function Choice(props) {
+  const resultInput = props.isFocus ? (
+    <input type="text" placeholder="Kindle" value={props.res} />
+  ) : null;
+  return (
+    <div>
+      <input type="text" placeholder={props.val} onFocus={props.handleFocus} />
+      {resultInput}
+    </div>
+  );
 }
 
 /* 然后开始建第一个选项 */
 class Question extends Component {
   constructor(props) {
     super(props);
-    const handleFocus = this.handleFocus.bind(this)
-    const handleSubmit = this.handleSubmit.bind(this)
-    const handleInput = this.handleInput.bind(this)
-    const createQuestion = (value)=>{ props.createQuestion(value)}
-    const handleNextClick =  this.handleNextClick.bind(this)
-    const cancelFocus = this.cancelFocus.bind(this)
-
+    const createQuestion = value => {
+      props.createQuestion(value);
+    };
     this.state = {
-      completed: false,
-      isFocus: -1,
-      title:null,
-      index:1,
-      handleFocus,
-      handleSubmit,
-      handleInput,
-      cancelFocus,
-      handleNextClick,
       createQuestion
     };
   }
+
   /* focus事件 */
-  handleFocus(idx) {
-    this.setState({isFocus:idx})
-  }
-  /* blur事件 */
-  cancelFocus(e){
-    console.log(e.target)
-  }
-  /* 提交 */
-  handleSubmit(e) {
-    e.preventDefault()
-    const {title,createQuestion} = this.state
-    createQuestion(title)
-    this.setState({
-      completed: true
-    });
-  }
-  /* 输入 */
-  handleInput(e){
-    const title = e.target.value
-    this.setState({title})
+  handleFocus(e) {
+    console.log('focus')
   }
 
-  /* 下一题 */
-  handleNextClick(e){
-    let {index} = this.state
-    index+=1
-    this.setState({index})
+  /* 输入 */
+  handleInput(e) {
+    const title = e.target.value;
+    this.setState({ title });
+  }
+
+  /* blur事件 */
+  handleBlur(e) {
+    
+  }
+
+  /* 提交 */
+  handleSubmit(e) {
+    e.preventDefault();
+    const { title, createQuestion } = this.state;
+    createQuestion(title);
   }
 
   render() {
-    const state = this.state;
-    const {index} = this.state
-    const questions = []
-    for(let i = 0;i<index;i++){
-      questions.push(<QuestionItem {...state} key={i} />)
+    const { title, children } = this.props.currentItem;
+    const questions = [];
+    const nextIndex = children ? children.length + 1 : 1;
+    const handleFocus = this.handleFocus.bind(this)
+    const events = {
+      handleFocus
+    }
+    if (children) {
+      children.forEach((item, index) => {
+        questions.push(<QuestionItem {...item} {...events} index={index} key={item.id} />);
+      });
     }
     return (
       <div className="question-item">
-        <h1>{this.props.topicTitle}</h1>
+        <h1>{title}</h1>
         {questions}
+        <QuestionAdd index={nextIndex} />
       </div>
     );
   }

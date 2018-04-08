@@ -11,20 +11,20 @@ class App extends PureComponent {
     super();
     this.createApp = this.createApp.bind(this);
     this.state = {
-      currentItem: null,
+      currentItem: null
     };
   }
 
   componentWillMount = () => {
     // 读取本地存储
-    const currentItem = JSON.parse(localStorage.getItem('currentItem'))
-    if(!!currentItem){
+    const currentItem = JSON.parse(localStorage.getItem("currentItem"));
+    if (!!currentItem) {
       this.setState({
         currentItem
-      })
+      });
     }
-  }
-  
+  };
+
   /* 新建一个项目 */
   createApp() {
     this.setState({
@@ -33,16 +33,16 @@ class App extends PureComponent {
   }
   /* 新建一个主题 */
   createTitle(title) {
-    const { currentItem } = this.state;
+    const currentItem = _.cloneDeep(this.state.currentItem);
     if (!_.isPlainObject(currentItem)) return;
     currentItem.title = title;
-    this.setState({currentItem});
-    localStorage.setItem('currentItem',JSON.stringify(currentItem))
+    this.setState({ currentItem });
+    localStorage.setItem("currentItem", JSON.stringify(currentItem));
   }
 
   /* 新建一个问题 */
   createQuestion(question) {
-    const { currentItem } = this.state;
+    const currentItem = _.cloneDeep(this.state.currentItem);
     let { children } = currentItem;
     if (!_.isArray(children)) {
       children = [];
@@ -51,16 +51,16 @@ class App extends PureComponent {
       title: question,
       id: children.length
     };
-    children.push(child)
-    currentItem.children = children
-    this.setState({currentItem:currentItem})
-    // localStorage.setItem('currentItem',JSON.stringify(currentItem))
+    children.push(child);
+    currentItem.children = children;
+    this.setState({ currentItem: currentItem });
+    localStorage.setItem("currentItem", JSON.stringify(currentItem));
   }
 
   /* 新建一个答案 */
-  createAnswer(answer){
-    const {currentItem} = this.state
-    let {choices} = currentItem
+  createAnswer(answer) {
+    const currentItem = _.cloneDeep(this.state.currentItem);
+    let { choices } = currentItem;
     if (!_.isArray(choices)) {
       choices = [];
     }
@@ -68,27 +68,30 @@ class App extends PureComponent {
       title: answer,
       id: choices.length + 100
     };
-    choices.push(choice)
-    currentItem.choices = choices
-    this.setState(currentItem)
-    localStorage.setItem('currentItem',JSON.stringify(currentItem))
+    choices.push(choice);
+    currentItem.choices = choices;
+    this.setState(currentItem);
+    localStorage.setItem("currentItem", JSON.stringify(currentItem));
   }
 
   render() {
+    const nav = () => {
+      return (
+        <ul>
+          <li>
+            <Link to="/">返回首页</Link>
+          </li>
+          <li>
+            <Link to="/topic" onClick={this.createApp}>
+              创建问卷
+            </Link>
+          </li>
+        </ul>
+      );
+    };
     return (
       <Router>
         <div>
-          <ul>
-            <li>
-              <Link to="/">返回首页</Link>
-            </li>
-            <li>
-              <Link to="/topic" onClick={this.createApp}>
-                创建问卷
-              </Link>
-            </li>
-          </ul>
-          <hr />
           <Route
             exact
             path="/topic"
@@ -103,9 +106,13 @@ class App extends PureComponent {
             exact
             path="/question"
             render={props => (
-              <Question 
-              topicTitle={this.state.currentItem.title} 
-              createQuestion={(e)=>{this.createQuestion(e)}} {...props} />
+              <Question
+                currentItem={this.state.currentItem}
+                createQuestion={e => {
+                  this.createQuestion(e);
+                }}
+                {...props}
+              />
             )}
           />
           <Route exact path="/choice" component={Choice} />
