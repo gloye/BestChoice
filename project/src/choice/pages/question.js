@@ -1,10 +1,24 @@
 import React, { Component } from "react";
 
 function QuestionItem(props) {
-  const Choices = []
-  props.children.forEach(item=>{
-      Choices.push(<Choice val={item.title} {...props}/>)
-  })
+  const { handleFocus, handleInput, id, currentOptionId } = props;
+  const Choices = [];
+  const events = {
+    handleFocus,
+    handleInput
+  };
+  props.children.forEach((item, idx) => {
+    Choices.push(
+      <Choice
+        val={item.title}
+        currentOptionId={currentOptionId}
+        pid={id}
+        index={idx}
+        key={idx}
+        {...events}
+      />
+    );
+  });
   return (
     <div className="item">
       <h3>
@@ -42,18 +56,23 @@ function QuestionAdd(props) {
 }
 
 function Choice(props) {
-  const resultInput = props.isFocus ? (
-    <input type="text" placeholder="Kindle" value={props.res} />
-  ) : null;
+  const id = "c" + props.pid + props.index;
+  const resultInput =
+    props.currentOptionId === id ? (
+      <input type="text" placeholder="Kindle" value={props.res} />
+    ) : null;
   return (
     <div>
       <input
         type="text"
         className="optionInput"
         placeholder={props.val}
-        value = {props.val}
-        onFocus={props.handleFocus}
-        onChange = {(e)=>{props.handleInput(e)}}
+        value={props.val}
+        id={id}
+        onFocus={e => props.handleFocus(e)}
+        onChange={e => {
+          props.handleInput(e);
+        }}
       />
       {resultInput}
     </div>
@@ -69,15 +88,18 @@ class Question extends Component {
     };
     this.state = {
       title: null,
-      options: [null, null],
-      currentInputClass: null,
+      currentOptionId: null,
       createQuestion
     };
   }
 
   /* focus事件 */
   handleFocus(e) {
-  
+    // 获取触发点击事件的input的id
+    const currentOptionId = e.target.id;
+    this.setState({
+      currentOptionId
+    });
   }
 
   /* blur事件 */
@@ -85,17 +107,17 @@ class Question extends Component {
 
   /* 输入 */
   handleInput(e) {
-    const that = this
-    const {className} = e.target
+    const that = this;
+    const { className } = e.target;
     switch (className) {
       case "questionInput":
         const title = e.target.value;
-        that.setState({title})
+        that.setState({ title });
         break;
       case "optionInput":
         break;
       default:
-        return null
+        return null;
     }
   }
 
@@ -108,11 +130,12 @@ class Question extends Component {
 
   render() {
     const { title, children } = this.props.currentItem;
-    const questions = [];
+    const Questions = [];
     const nextIndex = children ? children.length + 1 : 1;
     const handleFocus = this.handleFocus.bind(this);
     const handleInput = this.handleInput.bind(this);
     const handleSubmit = this.handleSubmit.bind(this);
+    const { currentOptionId } = this.state;
     const events = {
       handleFocus,
       handleInput,
@@ -120,15 +143,21 @@ class Question extends Component {
     };
     if (children) {
       children.forEach((item, index) => {
-        questions.push(
-          <QuestionItem {...item} {...events} index={index} key={item.id} />
+        Questions.push(
+          <QuestionItem
+            {...events}
+            {...item}
+            currentOptionId={currentOptionId}
+            index={index}
+            key={item.id}
+          />
         );
       });
     }
     return (
       <div className="question-item">
         <h1>{title ? title : "尚未定义主题"}</h1>
-        {questions}
+        {Questions}
         <QuestionAdd index={nextIndex} {...events} />
       </div>
     );
