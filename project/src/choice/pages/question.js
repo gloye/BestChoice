@@ -1,21 +1,14 @@
 import React, { Component } from "react";
 
 function QuestionItem(props) {
-  const { handleFocus, handleInput, id, currentOptionId } = props;
   const Choices = [];
-  const events = {
-    handleFocus,
-    handleInput
-  };
   props.children.forEach((item, idx) => {
     Choices.push(
       <Choice
+        {...props}
         val={item.title}
-        currentOptionId={currentOptionId}
-        pid={id}
         index={idx}
         key={idx}
-        {...events}
       />
     );
   });
@@ -44,6 +37,7 @@ function QuestionAdd(props) {
           }}
         />
         <button
+          className="titleInput"
           onClick={e => {
             props.handleSubmit(e);
           }}
@@ -56,25 +50,36 @@ function QuestionAdd(props) {
 }
 
 function Choice(props) {
-  const id = "c" + props.pid + props.index;
-  const resultInput =
-    props.currentOptionId === id ? (
-      <input type="text" placeholder="Kindle" value={props.res} />
-    ) : null;
+  const ResultGroup = () => (
+    <div className="resultGroup">
+      <input
+        type="text"
+        className="resultInput"
+        placeholder="不填跳转下一题"
+        onChange={e => {
+          props.handleInput(e);
+        }}
+      />
+      <button
+        className="resultSubmit"
+        onClick={e => {
+          props.handleSubmit(e);
+        }}
+      >
+        提交
+      </button>
+    </div>
+  );
+
   return (
     <div>
       <input
         type="text"
         className="optionInput"
         placeholder={props.val}
-        value={props.val}
-        id={id}
-        onFocus={e => props.handleFocus(e)}
-        onChange={e => {
-          props.handleInput(e);
-        }}
+        onChange={e => props.handleInput(e)}
       />
-      {resultInput}
+      <ResultGroup />
     </div>
   );
 }
@@ -86,20 +91,20 @@ class Question extends Component {
     const createQuestion = value => {
       props.createQuestion(value);
     };
+    const createAnswer = value => {
+      props.createAnswer(value);
+    };
     this.state = {
-      title: null,
-      currentOptionId: null,
-      createQuestion
+      title: null, // 用于提交标题赋值
+      res: null, // 用于提交结果赋值
+      createQuestion,
+      createAnswer
     };
   }
 
   /* focus事件 */
   handleFocus(e) {
-    // 获取触发点击事件的input的id
-    const currentOptionId = e.target.id;
-    this.setState({
-      currentOptionId
-    });
+    
   }
 
   /* blur事件 */
@@ -107,14 +112,19 @@ class Question extends Component {
 
   /* 输入 */
   handleInput(e) {
-    const that = this;
     const { className } = e.target;
     switch (className) {
       case "questionInput":
-        const title = e.target.value;
-        that.setState({ title });
+        let title = e.target.value;
+        this.setState({ title });
         break;
       case "optionInput":
+        break;
+      case "resultInput":
+        let res = e.target.value;
+        setTimeout(()=>{
+          this.setState({res})
+        },1000)
         break;
       default:
         return null;
@@ -124,8 +134,19 @@ class Question extends Component {
   /* 提交 */
   handleSubmit(e) {
     e.preventDefault();
-    const { title, createQuestion } = this.state;
-    createQuestion(title);
+    const className = e.target;
+    switch (className) {
+      case "titleSubmit":
+        const { title, createQuestion } = this.state;
+        createQuestion(title);
+        break;
+      case "resultSubmit":
+        const { result, createAnswer } = this.state;
+        createAnswer(result);
+        break;
+      default:
+        return null;
+    }
   }
 
   render() {
@@ -135,7 +156,6 @@ class Question extends Component {
     const handleFocus = this.handleFocus.bind(this);
     const handleInput = this.handleInput.bind(this);
     const handleSubmit = this.handleSubmit.bind(this);
-    const { currentOptionId } = this.state;
     const events = {
       handleFocus,
       handleInput,
@@ -147,7 +167,6 @@ class Question extends Component {
           <QuestionItem
             {...events}
             {...item}
-            currentOptionId={currentOptionId}
             index={index}
             key={item.id}
           />

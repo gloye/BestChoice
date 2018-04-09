@@ -29,7 +29,7 @@ class App extends PureComponent {
 
   /* 新建一个项目 */
   createApp() {
-    localStorage.removeItem('currentItem')
+    localStorage.removeItem("currentItem");
     this.setState({
       currentItem: {}
     });
@@ -87,7 +87,11 @@ class App extends PureComponent {
   }
 
   render() {
-    const Nav = () => <Link to="/topic" onClick={this.createApp}>创建问卷</Link>;
+    const Nav = () => (
+      <Link to="/topic" onClick={this.createApp}>
+        创建问卷
+      </Link>
+    );
     const NotFound = () => <h1>404 Not Found</h1>;
     return (
       <Router>
@@ -107,9 +111,8 @@ class App extends PureComponent {
               render={props => (
                 <Question
                   currentItem={this.state.currentItem}
-                  createQuestion={e => {
-                    this.createQuestion(e);
-                  }}
+                  createQuestion={(q)=>{this.createQuestion(q)}}
+                  createAnswer={(a)=>{this.createAnswer(a)}}
                   {...props}
                 />
               )}
