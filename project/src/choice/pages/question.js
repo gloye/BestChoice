@@ -96,16 +96,15 @@ class Question extends Component {
     };
     this.state = {
       title: null, // 用于提交标题赋值
-      res: null, // 用于提交结果赋值
+      result: null, // 用于提交结果赋值
+      option:null,
       createQuestion,
       createAnswer
     };
   }
 
   /* focus事件 */
-  handleFocus(e) {
-    
-  }
+  handleFocus(e) {}
 
   /* blur事件 */
   handleBlur(e) {}
@@ -119,12 +118,12 @@ class Question extends Component {
         this.setState({ title });
         break;
       case "optionInput":
+        const option = e.target.value;
+        this.setState({option})
         break;
       case "resultInput":
-        let res = e.target.value;
-        setTimeout(()=>{
-          this.setState({res})
-        },1000)
+        const result = e.target.value;
+        this.setState({result})
         break;
       default:
         return null;
@@ -139,6 +138,8 @@ class Question extends Component {
       case "titleSubmit":
         const { title, createQuestion } = this.state;
         createQuestion(title);
+        break;
+      case "optionSubmit":
         break;
       case "resultSubmit":
         const { result, createAnswer } = this.state;
