@@ -5,7 +5,8 @@ function QuestionItem(props) {
   props.children.forEach((item, idx) => {
     Choices.push(
       <Choice
-        {...props}
+        handleInput={props.handleInput}
+        handleSubmit={props.handleSubmit}
         val={item.title}
         index={idx}
         key={idx}
@@ -50,27 +51,6 @@ function QuestionAdd(props) {
 }
 
 function Choice(props) {
-  const ResultGroup = () => (
-    <div className="resultGroup">
-      <input
-        type="text"
-        className="resultInput"
-        placeholder="不填跳转下一题"
-        onChange={e => {
-          props.handleInput(e);
-        }}
-      />
-      <button
-        className="resultSubmit"
-        onClick={e => {
-          props.handleSubmit(e);
-        }}
-      >
-        提交
-      </button>
-    </div>
-  );
-
   return (
     <div>
       <input
@@ -79,27 +59,41 @@ function Choice(props) {
         placeholder={props.val}
         onChange={e => props.handleInput(e)}
       />
-      <ResultGroup />
+      <ResultGroup {...props}/>
     </div>
   );
 }
+
+/* 结果分类 */
+const ResultGroup = (props) => (
+  <div className="resultGroup">
+    <input
+      type="text"
+      className="resultInput"
+      onChange={e => {
+        props.handleInput(e);
+      }}
+    />
+    <button
+      className="resultSubmit"
+      onClick={e => {
+        props.handleSubmit(e);
+      }}
+    >
+      提交
+    </button>
+  </div>
+);
+
 
 /* 然后开始建第一个选项 */
 class Question extends Component {
   constructor(props) {
     super(props);
-    const createQuestion = value => {
-      props.createQuestion(value);
-    };
-    const createAnswer = value => {
-      props.createAnswer(value);
-    };
     this.state = {
       title: null, // 用于提交标题赋值
-      result: null, // 用于提交结果赋值
-      option:null,
-      createQuestion,
-      createAnswer
+      restext: null, // 用于提交结果赋值
+      option: null
     };
   }
 
@@ -119,11 +113,11 @@ class Question extends Component {
         break;
       case "optionInput":
         const option = e.target.value;
-        this.setState({option})
+        this.setState({ option });
         break;
       case "resultInput":
-        const result = e.target.value;
-        this.setState({result})
+        const restext = e.target.value;
+        this.setState({ restext });
         break;
       default:
         return null;
@@ -136,13 +130,15 @@ class Question extends Component {
     const className = e.target;
     switch (className) {
       case "titleSubmit":
-        const { title, createQuestion } = this.state;
+        const { title } = this.state;
+        const { createQuestion } = this.props;
         createQuestion(title);
         break;
       case "optionSubmit":
         break;
       case "resultSubmit":
-        const { result, createAnswer } = this.state;
+        const { result } = this.state;
+        const { createAnswer } = this.props;
         createAnswer(result);
         break;
       default:
@@ -165,12 +161,7 @@ class Question extends Component {
     if (children) {
       children.forEach((item, index) => {
         Questions.push(
-          <QuestionItem
-            {...events}
-            {...item}
-            index={index}
-            key={item.id}
-          />
+          <QuestionItem {...events} {...item} index={index} key={item.id} />
         );
       });
     }
