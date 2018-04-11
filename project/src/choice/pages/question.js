@@ -38,7 +38,7 @@ function QuestionAdd(props) {
           }}
         />
         <button
-          className="titleInput"
+          className="titleSubmit"
           onClick={e => {
             props.handleSubmit(e);
           }}
@@ -59,32 +59,24 @@ function Choice(props) {
         placeholder={props.val}
         onChange={e => props.handleInput(e)}
       />
-      <ResultGroup {...props}/>
+      <input
+        type="text"
+        className="resultInput"
+        onChange={e => {
+          props.handleInput(e);
+        }}
+      />
+      <button
+        className="resultSubmit"
+        onClick={e => {
+          props.handleSubmit(e);
+        }}
+      >
+        提交
+      </button>
     </div>
   );
 }
-
-/* 结果分类 */
-const ResultGroup = (props) => (
-  <div className="resultGroup">
-    <input
-      type="text"
-      className="resultInput"
-      onChange={e => {
-        props.handleInput(e);
-      }}
-    />
-    <button
-      className="resultSubmit"
-      onClick={e => {
-        props.handleSubmit(e);
-      }}
-    >
-      提交
-    </button>
-  </div>
-);
-
 
 /* 然后开始建第一个选项 */
 class Question extends Component {
@@ -92,7 +84,7 @@ class Question extends Component {
     super(props);
     this.state = {
       title: null, // 用于提交标题赋值
-      restext: null, // 用于提交结果赋值
+      result: null, // 用于提交结果赋值
       option: null
     };
   }
@@ -108,16 +100,19 @@ class Question extends Component {
     const { className } = e.target;
     switch (className) {
       case "questionInput":
-        let title = e.target.value;
+        const title = e.target.value;
         this.setState({ title });
         break;
       case "optionInput":
         const option = e.target.value;
-        this.setState({ option });
+        const pid = null
+        const target = null
+        const index = null
+        const { updateOption } = this.props;
         break;
       case "resultInput":
-        const restext = e.target.value;
-        this.setState({ restext });
+        const result = e.target.value;
+        this.setState({ result });
         break;
       default:
         return null;
@@ -127,7 +122,7 @@ class Question extends Component {
   /* 提交 */
   handleSubmit(e) {
     e.preventDefault();
-    const className = e.target;
+    const {className} = e.target;
     switch (className) {
       case "titleSubmit":
         const { title } = this.state;

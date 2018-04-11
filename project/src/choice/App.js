@@ -51,22 +51,46 @@ class App extends PureComponent {
     if (!_.isArray(children)) {
       children = [];
     }
+    const options = this.initOption();
     const child = {
       title: question,
       id: children.length,
-      children: [
-        {
-          title: "是"
-        },
-        {
-          title: "否"
-        }
-      ]
+      children: options
     };
     children.push(child);
     currentItem.children = children;
-    this.setState({ currentItem: currentItem });
+    this.setState({ currentItem });
     localStorage.setItem("currentItem", JSON.stringify(currentItem));
+  }
+
+  /* 初始化选项 */
+  initOption() {
+    const options = [
+      {
+        title: "是"
+      },
+      {
+        title: "否"
+      }
+    ];
+    return options;
+  }
+
+  /* 更改默认选项 */
+  updateOption(o) {
+    const { pid, title, index, target } = o;
+    const currentItem = _.cloneDeep(this.state.currentItem);
+    const { children } = currentItem;
+    children.forEach(item => {
+      if (item.id === pid) {
+        const currentOption = {
+          title,
+          target
+        };
+        item.children[index] = currentOption;
+      }
+    });
+    this.setState({ currentItem });
   }
 
   /* 新建一个答案 */
@@ -82,7 +106,7 @@ class App extends PureComponent {
     };
     choices.push(choice);
     currentItem.choices = choices;
-    this.setState(currentItem);
+    this.setState({ currentItem });
     localStorage.setItem("currentItem", JSON.stringify(currentItem));
   }
 
@@ -111,8 +135,9 @@ class App extends PureComponent {
               render={props => (
                 <Question
                   currentItem={this.state.currentItem}
-                  createQuestion={(q)=>{this.createQuestion(q)}}
-                  createAnswer={(a)=>{this.createAnswer(a)}}
+                  createQuestion={q => this.createQuestion(q)}
+                  createAnswer={a => this.createAnswer(a)}
+                  updateOption={o => this.updateOption(o)}
                   {...props}
                 />
               )}
