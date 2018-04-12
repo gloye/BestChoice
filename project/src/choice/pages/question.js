@@ -8,6 +8,7 @@ function QuestionItem(props) {
         handleInput={props.handleInput}
         handleSubmit={props.handleSubmit}
         val={item.title}
+        pindex={props.index}
         index={idx}
         key={idx}
       />
@@ -51,14 +52,24 @@ function QuestionAdd(props) {
 }
 
 function Choice(props) {
+  const { index, pindex } = props;
   return (
     <div>
       <input
         type="text"
         className="optionInput"
         placeholder={props.val}
-        onChange={e => props.handleInput(e)}
+        onChange={e => props.handleInput(e, { index, pindex })}
       />
+
+      <button
+        className="optionSubmit"
+        onClick={e => {
+          props.handleSubmit(e);
+        }}
+      >
+        下一题
+      </button>
       <input
         type="text"
         className="resultInput"
@@ -84,8 +95,9 @@ class Question extends Component {
     super(props);
     this.state = {
       title: null, // 用于提交标题赋值
+      option: null, // 用于提交选项赋值
       result: null, // 用于提交结果赋值
-      option: null
+      add:false
     };
   }
 
@@ -96,7 +108,7 @@ class Question extends Component {
   handleBlur(e) {}
 
   /* 输入 */
-  handleInput(e) {
+  handleInput(e, ...args) {
     const { className } = e.target;
     switch (className) {
       case "questionInput":
@@ -105,10 +117,15 @@ class Question extends Component {
         break;
       case "optionInput":
         const option = e.target.value;
-        const pid = null
-        const target = null
-        const index = null
+        this.setState({ option });
+        const obj = Object.assign(
+          {
+            title: option
+          },
+          args[0]
+        );
         const { updateOption } = this.props;
+        updateOption(obj);
         break;
       case "resultInput":
         const result = e.target.value;
@@ -120,9 +137,9 @@ class Question extends Component {
   }
 
   /* 提交 */
-  handleSubmit(e) {
+  handleSubmit(e, ...args) {
     e.preventDefault();
-    const {className} = e.target;
+    const { className } = e.target;
     switch (className) {
       case "titleSubmit":
         const { title } = this.state;
@@ -130,10 +147,12 @@ class Question extends Component {
         createQuestion(title);
         break;
       case "optionSubmit":
+        /* 下一题 */
         break;
       case "resultSubmit":
         const { result } = this.state;
         const { createAnswer } = this.props;
+        const options = args[0]
         createAnswer(result);
         break;
       default:
@@ -164,7 +183,7 @@ class Question extends Component {
       <div className="question-item">
         <h1>{title ? title : "尚未定义主题"}</h1>
         {Questions}
-        <QuestionAdd index={nextIndex} {...events} />
+        {this.state.add?<QuestionAdd index={nextIndex} {...events} />:null}
       </div>
     );
   }
