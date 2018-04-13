@@ -8,12 +8,14 @@ class Topic extends PureComponent {
       title: null
     };
   }
+  
   handleTitleChange(e) {
     const title = e.target.value;
     this.setState({
       title
     })
   }
+
   render() {
     const title = this.state.title
     return (

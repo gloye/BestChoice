@@ -1,5 +1,6 @@
 import React, { PureComponent } from "react";
 import _ from "lodash";
+import localforage from "localforage";
 import { BrowserRouter as Router, Route, Link, Switch } from "react-router-dom";
 
 import Topic from "./pages/topic";
@@ -15,21 +16,24 @@ class App extends PureComponent {
     };
   }
 
-  componentWillMount = () => {
+  componentDidMount = () => {
     // 读取本地存储
-    const currentItem = JSON.parse(localStorage.getItem("currentItem"));
-    if (!!currentItem) {
-      this.setState({
-        currentItem
-      });
-    } else {
-      this.createApp();
-    }
+    localforage
+      .getItem("currentItem")
+      .then(data => {
+        console.log(data);
+        if (!!data) {
+          this.setState({ currentItem: data });
+        } else {
+          this.createApp();
+        }
+      })
+      .catch(err => console.log(err));
   };
 
   /* 新建一个项目 */
   createApp() {
-    localStorage.removeItem("currentItem");
+    localforage.removeItem("currentItem");
     this.setState({
       currentItem: {}
     });
@@ -41,7 +45,7 @@ class App extends PureComponent {
     if (!_.isPlainObject(currentItem)) return;
     currentItem.title = title;
     this.setState({ currentItem });
-    localStorage.setItem("currentItem", JSON.stringify(currentItem));
+    localforage.setItem("currentItem", currentItem);
   }
 
   /* 新建一个问题 */
@@ -60,7 +64,7 @@ class App extends PureComponent {
     children.push(child);
     currentItem.children = children;
     this.setState({ currentItem });
-    localStorage.setItem("currentItem", JSON.stringify(currentItem));
+    localforage.setItem("currentItem", currentItem);
   }
 
   /* 初始化选项 */
@@ -78,10 +82,11 @@ class App extends PureComponent {
 
   /* 更改默认选项 */
   updateOption(o) {
-    const { index, pindex, title } = o;
+    const { index, pindex, option } = o;
     const currentItem = _.cloneDeep(this.state.currentItem);
-    currentItem.children[pindex].children[index].title = title;
-    this.setState({ currentItem });localStorage.setItem("currentItem", JSON.stringify(currentItem));
+    if (option) currentItem.children[pindex].children[index].title = option;
+    this.setState({ currentItem });
+    localforage.setItem("currentItem", currentItem);
   }
 
   /* 新建一个答案 */
@@ -98,48 +103,54 @@ class App extends PureComponent {
     choices.push(choice);
     currentItem.choices = choices;
     this.setState({ currentItem });
-    localStorage.setItem("currentItem", JSON.stringify(currentItem));
+    alert("提交成功");
+    localforage.setItem("currentItem", currentItem);
   }
 
   render() {
+    const { currentItem } = this.state;
     const Nav = () => (
       <Link to="/topic" onClick={this.createApp}>
         创建问卷
       </Link>
     );
     const NotFound = () => <h1>404 Not Found</h1>;
-    return (
-      <Router>
-        <div>
-          <Switch>
-            <Route
-              path="/topic"
-              render={props => (
-                <Topic
-                  createTitle={title => this.createTitle(title)}
-                  {...props}
-                />
-              )}
-            />
-            <Route
-              path="/question"
-              render={props => (
-                <Question
-                  currentItem={this.state.currentItem}
-                  createQuestion={q => this.createQuestion(q)}
-                  createAnswer={a => this.createAnswer(a)}
-                  updateOption={o => this.updateOption(o)}
-                  {...props}
-                />
-              )}
-            />
-            <Route path="/choice" component={Choice} />
-            <Route exact path="/" component={Nav} />
-            <Route component={NotFound} />
-          </Switch>
-        </div>
-      </Router>
-    );
+    if (!currentItem) {
+      return <div>加载中</div>;
+    } else {
+      return (
+        <Router>
+          <div>
+            <Switch>
+              <Route
+                path="/topic"
+                render={props => (
+                  <Topic
+                    createTitle={title => this.createTitle(title)}
+                    {...props}
+                  />
+                )}
+              />
+              <Route
+                path="/question"
+                render={props => (
+                  <Question
+                    currentItem={currentItem}
+                    createQuestion={q => this.createQuestion(q)}
+                    createAnswer={a => this.createAnswer(a)}
+                    updateOption={o => this.updateOption(o)}
+                    {...props}
+                  />
+                )}
+              />
+              <Route path="/choice" component={Choice} />
+              <Route exact path="/" component={Nav} />
+              <Route component={NotFound} />
+            </Switch>
+          </div>
+        </Router>
+      );
+    }
   }
 }
 

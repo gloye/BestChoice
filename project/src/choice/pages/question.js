@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import _ from "lodash";
 
 function QuestionItem(props) {
   const Choices = [];
@@ -59,13 +60,13 @@ function Choice(props) {
         type="text"
         className="optionInput"
         placeholder={props.val}
-        onChange={e => props.handleInput(e, { index, pindex })}
+        onChange={e => props.handleInput(e)}
       />
 
       <button
         className="optionSubmit"
         onClick={e => {
-          props.handleSubmit(e);
+          props.handleSubmit(e, { index, pindex });
         }}
       >
         下一题
@@ -97,7 +98,8 @@ class Question extends Component {
       title: null, // 用于提交标题赋值
       option: null, // 用于提交选项赋值
       result: null, // 用于提交结果赋值
-      add:false
+      position: [0, 0],
+      add: false
     };
   }
 
@@ -118,14 +120,6 @@ class Question extends Component {
       case "optionInput":
         const option = e.target.value;
         this.setState({ option });
-        const obj = Object.assign(
-          {
-            title: option
-          },
-          args[0]
-        );
-        const { updateOption } = this.props;
-        updateOption(obj);
         break;
       case "resultInput":
         const result = e.target.value;
@@ -136,23 +130,55 @@ class Question extends Component {
     }
   }
 
+  checkPosition(positionDist) {
+    const { position } = this.state;
+    return _.isEqual(position, positionDist);
+  }
+
   /* 提交 */
   handleSubmit(e, ...args) {
     e.preventDefault();
+    let { children,choices } = this.props.currentItem;
+    // question id & choice id
+    if (!Array.isArray(children)) {
+      children = [];
+    }
+    if (!Array.isArray(choices)) {
+      choices = [];
+    }
+    const questionId = children.length + 1;
+    const choiceId = 100 + choices.length + 1;
+    // props method
+    const { createQuestion, updateOption } = this.props;
+    const { pindex, index } = args?args:{pindex:-1,index:-1};
     const { className } = e.target;
     switch (className) {
       case "titleSubmit":
         const { title } = this.state;
-        const { createQuestion } = this.props;
         createQuestion(title);
+        this.setState({
+          add:false
+        })
         break;
       case "optionSubmit":
-        /* 下一题 */
+        /**
+         * props: title target(question/choice)
+         */
+        const { option } = this.state;
+        const targetId = this.checkPosition([pindex, index])
+          ? choiceId
+          : questionId;
+        const obj = Object.assign({ option, target: targetId }, args[0]);
+        updateOption(obj);
+        this.setState({
+          add: true
+        });
         break;
       case "resultSubmit":
         const { result } = this.state;
         const { createAnswer } = this.props;
-        const options = args[0]
+        const position = [pindex, index];
+        this.setState(position);
         createAnswer(result);
         break;
       default:
@@ -160,6 +186,16 @@ class Question extends Component {
     }
   }
 
+  componentDidMount = () => {
+    const {children} = this.props.currentItem
+    if(!children){
+      this.setState({
+        add:true
+      })
+    }
+  }
+  
+  
   render() {
     const { title, children } = this.props.currentItem;
     const Questions = [];
@@ -183,7 +219,7 @@ class Question extends Component {
       <div className="question-item">
         <h1>{title ? title : "尚未定义主题"}</h1>
         {Questions}
-        {this.state.add?<QuestionAdd index={nextIndex} {...events} />:null}
+        {this.state.add ? <QuestionAdd index={nextIndex} {...events} /> : null}
       </div>
     );
   }
