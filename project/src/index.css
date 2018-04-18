@@ -12,8 +12,13 @@ ul{
   left:0;
   top:100%;
   background-color:#fff;
-  width:300px;
-  height:300px;
+  width:240px;
+  padding:10px 0;
   border:1px solid #ccc;
   z-index: 1;
+}
+
+li:hover{
+  background:#ddd;
+  color:#fff;
 }

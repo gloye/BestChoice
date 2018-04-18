@@ -21,7 +21,6 @@ class App extends PureComponent {
     localforage
       .getItem("currentItem")
       .then(data => {
-        console.log(data);
         if (!!data) {
           this.setState({ currentItem: data });
         } else {

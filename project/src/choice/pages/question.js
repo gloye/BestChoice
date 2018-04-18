@@ -7,12 +7,14 @@ function QuestionItem(props) {
     Choices.push(
       <Choice
         handleInput={props.handleInput}
+        handleBlur={props.handleBlur}
         handleSubmit={props.handleSubmit}
+        smartChoices={props.smartChoices}
         value={item.title}
         pindex={props.index}
         index={i}
         key={i}
-        isFocus={props.pindex===props.position[0]&&props.index===props.position[1]}
+        isCurrent={props.index === props.position[0] && i === props.position[1]}
       />
     );
   });
@@ -54,8 +56,10 @@ function QuestionAdd(props) {
 }
 
 function Choice(props) {
-  const { index, pindex } = props;
-  const inputTip = 0 ? <SmartChoices choices={props.smartChoices} /> : null;
+  const { index, pindex, isCurrent } = props;
+  const inputTip = isCurrent ? (
+    <SmartChoices choices={props.smartChoices} />
+  ) : null;
   return (
     <div>
       <input
@@ -77,6 +81,9 @@ function Choice(props) {
         <input
           type="text"
           className="resultInput"
+          onBlur={e => {
+            props.handleBlur(e);
+          }}
           onChange={e => {
             props.handleInput(e, { index, pindex });
           }}
@@ -96,13 +103,20 @@ function Choice(props) {
 }
 
 function SmartChoices(props) {
-  let { choices } = props;
-  if (!!Array.isArray(choices)) {
-    choices.map(item => <li>item.title</li>);
+  const { choices } = props;
+  const options = [];
+  if (_.isArray(choices) && !_.isEmpty(choices)) {
+    choices.map((item, i) =>
+      options.push(
+        <li key={i} onClick={props.checkOption}>
+          {item.title}
+        </li>
+      )
+    );
   } else {
-    choices = "test";
+    return null;
   }
-  return <ul>{choices}</ul>;
+  return <ul>{options}</ul>;
 }
 
 /* 然后开始建第一个选项 */
@@ -123,13 +137,24 @@ class Question extends Component {
   handleFocus(e) {}
 
   /* blur事件 */
-  handleBlur(e) {}
+  handleBlur(e) {
+    const { className } = e.target;
+    switch (className) {
+      case "resultInput":
+        this.setState({
+          smartChoices: null
+        });
+        break;
+      default:
+        return;
+    }
+  }
 
   /* 输入 */
   handleInput(e, ...args) {
     const { className } = e.target;
     const { pindex, index } = args ? args[0] : { pindex: -1, index: -1 };
-    const position = [pindex,index]
+    const position = [pindex, index];
     switch (className) {
       case "questionInput":
         const title = e.target.value;
@@ -155,8 +180,9 @@ class Question extends Component {
   /* 智能提示 */
   smartType(inputVal) {
     let { choices } = this.props.currentItem;
-    if (!choices||!Array.isArray(choices)) return;
-    const filterMethod = item => item.title.includes(inputVal);
+    if (!choices || !Array.isArray(choices)) return;
+    const filterMethod = item =>
+      item.title.includes(inputVal) && inputVal !== "";
     const smartChoices = choices.filter(filterMethod);
     this.setState({
       smartChoices
@@ -182,7 +208,7 @@ class Question extends Component {
     const questionId = children.length + 1;
     const choiceId = 100 + choices.length + 1;
     // props method
-    const { createQuestion, updateOption,currentItem } = this.props;
+    const { createQuestion, updateOption, currentItem } = this.props;
     const { pindex, index } = args ? args : { pindex: -1, index: -1 };
     const { className } = e.target;
     switch (className) {
@@ -207,8 +233,8 @@ class Question extends Component {
       case "resultSubmit":
         const { result } = this.state;
         const { createAnswer } = this.props;
-        if(pindex!==-1&&index!==-1){
-          currentItem.children[pindex].children[index].focus = true
+        if (pindex !== -1 && index !== -1) {
+          currentItem.children[pindex].children[index].focus = true;
         }
         createAnswer(result);
         break;
@@ -232,11 +258,13 @@ class Question extends Component {
     const nextIndex = children ? children.length + 1 : 1;
     const handleFocus = this.handleFocus.bind(this);
     const handleInput = this.handleInput.bind(this);
+    const handleBlur = this.handleBlur.bind(this);
     const handleSubmit = this.handleSubmit.bind(this);
-    const {smartChoices,position} = this.state;
+    const { smartChoices, position } = this.state;
     const events = {
       handleFocus,
       handleInput,
+      handleBlur,
       handleSubmit
     };
     if (children) {
@@ -246,7 +274,7 @@ class Question extends Component {
             {...events}
             {...item}
             smartChoices={smartChoices}
-            position = {position}
+            position={position}
             index={index}
             key={item.id}
           />
