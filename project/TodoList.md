@@ -21,8 +21,11 @@ cond3(yes)->e
 cond3(no)->c1->e
 ```
 
-- [x] 更新选项
-- [x] 问题
-- [x] 结果
-    - [ ] 选择
-    - [x] 添加
+## Todo list
+
+- [ ] option update
+    - [ ] disabled next button when the elment isn't empty
+    - [ ] choose a option
+    - [ ] submit a option
+        - [ ] check the option
+    - [ ] show the value in input element

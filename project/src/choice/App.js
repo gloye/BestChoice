@@ -57,7 +57,7 @@ class App extends PureComponent {
     const options = this.initOption();
     const child = {
       title: question,
-      id: children.length,
+      id: children.length + 1,
       children: options
     };
     children.push(child);
@@ -81,25 +81,37 @@ class App extends PureComponent {
 
   /* 更改默认选项 */
   updateOption(o) {
-    const { index, pindex, option } = o;
+    const { index, pindex, option,target } = o;
     const currentItem = _.cloneDeep(this.state.currentItem);
     if (option) currentItem.children[pindex].children[index].title = option;
+    currentItem.children[pindex].children[index].target = target
     this.setState({ currentItem });
     localforage.setItem("currentItem", currentItem);
   }
 
-  /* 新建一个答案 */
-  createAnswer(answer) {
+  /* 清除结果 */
+  clearChoices() {
+    const currentItem = _.cloneDeep(this.state.currentItem);
+    currentItem.choices = null;
+    this.setState({ currentItem });
+    localforage.setItem("currentItem", currentItem);
+    alert("清除成功");
+  }
+
+  /* 新建一个结果 */
+  createAnswer(o) {
+    const {index,pindex,target,result} = o
     const currentItem = _.cloneDeep(this.state.currentItem);
     let { choices } = currentItem;
     if (!_.isArray(choices)) {
       choices = [];
     }
     const choice = {
-      title: answer,
+      title: result,
       id: choices.length + 100
     };
     choices.push(choice);
+    currentItem.children[pindex].children[index].target = target
     currentItem.choices = choices;
     this.setState({ currentItem });
     alert("提交成功");
@@ -109,9 +121,12 @@ class App extends PureComponent {
   render() {
     const { currentItem } = this.state;
     const Nav = () => (
-      <Link to="/topic" onClick={this.createApp}>
-        创建问卷
-      </Link>
+      <div>
+        <Link to="/topic" onClick={this.createApp}>
+          创建问卷
+        </Link>
+        <button onClick={() => this.clearChoices()}>清除所有结果</button>
+      </div>
     );
     const NotFound = () => <h1>404 Not Found</h1>;
     if (!currentItem) {

@@ -81,6 +81,7 @@ function Choice(props) {
         <input
           type="text"
           className="resultInput"
+          placeholder={props.result}
           onBlur={e => {
             props.handleBlur(e);
           }}
@@ -153,7 +154,9 @@ class Question extends Component {
   /* 输入 */
   handleInput(e, ...args) {
     const { className } = e.target;
-    const { pindex, index } = args ? args[0] : { pindex: -1, index: -1 };
+    const { pindex, index } = !_.isEmpty(args)
+      ? args[0]
+      : { pindex: -1, index: -1 };
     const position = [pindex, index];
     switch (className) {
       case "questionInput":
@@ -169,7 +172,7 @@ class Question extends Component {
         this.smartType(result);
         this.setState({
           result,
-          position
+          position //choice的位置
         });
         break;
       default:
@@ -205,38 +208,47 @@ class Question extends Component {
     if (!Array.isArray(choices)) {
       choices = [];
     }
+    const { title, option, result } = this.state;
     const questionId = children.length + 1;
-    const choiceId = 100 + choices.length + 1;
+    // compare with existing choice
+    let choiceId = 100 + choices.length + 1;
+    choices.forEach(item => {
+      if (item.title === result) {
+        choiceId = item.id;
+      }
+    });
+
     // props method
     const { createQuestion, updateOption, currentItem } = this.props;
-    const { pindex, index } = args ? args : { pindex: -1, index: -1 };
+    const { pindex, index } = !_.isEmpty(args)
+      ? args[0]
+      : { pindex: -1, index: -1 };
+    const targetId = this.checkPosition([pindex, index])
+      ? choiceId
+      : questionId;
+    const obj = Object.assign({target: targetId }, args[0]);
     const { className } = e.target;
     switch (className) {
       case "titleSubmit":
-        const { title } = this.state;
         createQuestion(title);
         this.setState({
           add: false
         });
         break;
       case "optionSubmit":
-        const { option } = this.state;
-        const targetId = this.checkPosition([pindex, index])
-          ? choiceId
-          : questionId;
-        const obj = Object.assign({ option, target: targetId }, args[0]);
-        updateOption(obj);
+        const optionObj = Object.assign({option},obj)
+        updateOption(optionObj);
         this.setState({
           add: true
         });
         break;
       case "resultSubmit":
-        const { result } = this.state;
         const { createAnswer } = this.props;
         if (pindex !== -1 && index !== -1) {
           currentItem.children[pindex].children[index].focus = true;
         }
-        createAnswer(result);
+        const resultObj = Object.assign({result},obj)
+        createAnswer(resultObj);
         break;
       default:
         return null;
@@ -244,16 +256,37 @@ class Question extends Component {
   }
 
   componentDidMount = () => {
-    const { children } = this.props.currentItem;
+    const { currentItem } = this.props;
+    const { children } = currentItem;
     if (!children) {
       this.setState({
         add: true
+      });
+    } else {
+      children.forEach(item => {
+        item.children.forEach(choiceItem => {
+          if (choiceItem.target && choiceItem.target !== 0) {
+            if (choiceItem.target < 100) {
+              choiceItem.dest = children.filter(
+                fitlerItem => fitlerItem.id === choiceItem.target
+              );
+            } else {
+              choiceItem.dest = this.props.currentItem.choices.filter(
+                item => item.id === choiceItem.target
+              )[0].title;
+            }
+          }
+        });
+      });
+      this.setState({
+        currentItem
       });
     }
   };
 
   render() {
-    const { title, children } = this.props.currentItem;
+    const { currentItem } = this.props;
+    const { title, children } = currentItem;
     const Questions = [];
     const nextIndex = children ? children.length + 1 : 1;
     const handleFocus = this.handleFocus.bind(this);
@@ -267,6 +300,7 @@ class Question extends Component {
       handleBlur,
       handleSubmit
     };
+    // add the title text for children.children
     if (children) {
       children.forEach((item, index) => {
         Questions.push(
@@ -286,6 +320,7 @@ class Question extends Component {
         <h1>{title ? title : "尚未定义主题"}</h1>
         {Questions}
         {this.state.add ? <QuestionAdd index={nextIndex} {...events} /> : null}
+        <pre>{JSON.stringify(currentItem)}</pre>
       </div>
     );
   }
