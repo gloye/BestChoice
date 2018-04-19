@@ -108,7 +108,7 @@ class App extends PureComponent {
     }
     const choice = {
       title: result,
-      id: choices.length + 100
+      id: choices.length + 101
     };
     choices.push(choice);
     currentItem.children[pindex].children[index].target = target

@@ -1,4 +1,4 @@
-# 流程图
+# Todo List
 
 ## Option Flow
 
@@ -24,8 +24,8 @@ cond3(no)->c1->e
 ## Todo list
 
 - [ ] option update
-    - [ ] disabled next button when the elment isn't empty
-    - [ ] choose a option
-    - [ ] submit a option
-        - [ ] check the option
-    - [ ] show the value in input element
+  - [x] disabled next button when the elment isn't empty
+  - [ ] choose a option
+  - [ ] submit a option
+    - [ ] check the option
+  - [x] show the value in input element

@@ -11,6 +11,7 @@ function QuestionItem(props) {
         handleSubmit={props.handleSubmit}
         smartChoices={props.smartChoices}
         value={item.title}
+        dest={item.dest}
         pindex={props.index}
         index={i}
         key={i}
@@ -71,6 +72,7 @@ function Choice(props) {
 
       <button
         className="optionSubmit"
+        disabled = {!!props.dest}
         onClick={e => {
           props.handleSubmit(e, { index, pindex });
         }}
@@ -81,7 +83,7 @@ function Choice(props) {
         <input
           type="text"
           className="resultInput"
-          placeholder={props.result}
+          placeholder={props.dest}
           onBlur={e => {
             props.handleBlur(e);
           }}
@@ -92,7 +94,7 @@ function Choice(props) {
         <button
           className="resultSubmit"
           onClick={e => {
-            props.handleSubmit(e);
+            props.handleSubmit(e, { index, pindex });
           }}
         >
           提交
@@ -226,7 +228,7 @@ class Question extends Component {
     const targetId = this.checkPosition([pindex, index])
       ? choiceId
       : questionId;
-    const obj = Object.assign({target: targetId }, args[0]);
+    const obj = Object.assign({ target: targetId }, args[0]);
     const { className } = e.target;
     switch (className) {
       case "titleSubmit":
@@ -236,7 +238,7 @@ class Question extends Component {
         });
         break;
       case "optionSubmit":
-        const optionObj = Object.assign({option},obj)
+        const optionObj = Object.assign({ option }, obj);
         updateOption(optionObj);
         this.setState({
           add: true
@@ -247,7 +249,7 @@ class Question extends Component {
         if (pindex !== -1 && index !== -1) {
           currentItem.children[pindex].children[index].focus = true;
         }
-        const resultObj = Object.assign({result},obj)
+        const resultObj = Object.assign({ result }, obj);
         createAnswer(resultObj);
         break;
       default:
@@ -266,11 +268,7 @@ class Question extends Component {
       children.forEach(item => {
         item.children.forEach(choiceItem => {
           if (choiceItem.target && choiceItem.target !== 0) {
-            if (choiceItem.target < 100) {
-              choiceItem.dest = children.filter(
-                fitlerItem => fitlerItem.id === choiceItem.target
-              );
-            } else {
+            if (choiceItem.target > 100) {
               choiceItem.dest = this.props.currentItem.choices.filter(
                 item => item.id === choiceItem.target
               )[0].title;
@@ -278,6 +276,7 @@ class Question extends Component {
           }
         });
       });
+      currentItem.children = children;
       this.setState({
         currentItem
       });
