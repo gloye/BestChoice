@@ -81,10 +81,10 @@ class App extends PureComponent {
 
   /* 更改默认选项 */
   updateOption(o) {
-    const { index, pindex, option,target } = o;
+    const { index, pindex, option, target } = o;
     const currentItem = _.cloneDeep(this.state.currentItem);
     if (option) currentItem.children[pindex].children[index].title = option;
-    currentItem.children[pindex].children[index].target = target
+    currentItem.children[pindex].children[index].target = target;
     this.setState({ currentItem });
     localforage.setItem("currentItem", currentItem);
   }
@@ -100,18 +100,25 @@ class App extends PureComponent {
 
   /* 新建一个结果 */
   createAnswer(o) {
-    const {index,pindex,target,result} = o
+    const { index, pindex, target, result } = o;
     const currentItem = _.cloneDeep(this.state.currentItem);
     let { choices } = currentItem;
     if (!_.isArray(choices)) {
       choices = [];
     }
-    const choice = {
-      title: result,
-      id: choices.length + 101
-    };
-    choices.push(choice);
-    currentItem.children[pindex].children[index].target = target
+    choices.forEach(item => {
+      if (item.title === result) {
+        const choiceId = item.id;
+        currentItem.children[pindex].children[index].target = choiceId;
+      }else{
+        const choice = {
+          title: result,
+          id: choices.length + 101
+        };
+        currentItem.children[pindex].children[index].target = target;
+        choices.push(choice);
+      }
+    });
     currentItem.choices = choices;
     this.setState({ currentItem });
     alert("提交成功");

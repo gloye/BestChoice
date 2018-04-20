@@ -10,6 +10,7 @@ function QuestionItem(props) {
         handleBlur={props.handleBlur}
         handleSubmit={props.handleSubmit}
         smartChoices={props.smartChoices}
+        checkChoice={props.checkChoice}
         value={item.title}
         dest={item.dest}
         pindex={props.index}
@@ -59,7 +60,10 @@ function QuestionAdd(props) {
 function Choice(props) {
   const { index, pindex, isCurrent } = props;
   const inputTip = isCurrent ? (
-    <SmartChoices choices={props.smartChoices} />
+    <SmartChoices
+      choices={props.smartChoices}
+      checkChoice={props.checkChoice}
+    />
   ) : null;
   return (
     <div>
@@ -72,7 +76,7 @@ function Choice(props) {
 
       <button
         className="optionSubmit"
-        disabled = {!!props.dest}
+        disabled={!!props.dest}
         onClick={e => {
           props.handleSubmit(e, { index, pindex });
         }}
@@ -185,12 +189,19 @@ class Question extends Component {
   /* 智能提示 */
   smartType(inputVal) {
     let { choices } = this.props.currentItem;
-    if (!choices || !Array.isArray(choices)) return;
+    if (!_.isArray(choices)) return;
     const filterMethod = item =>
       item.title.includes(inputVal) && inputVal !== "";
     const smartChoices = choices.filter(filterMethod);
     this.setState({
       smartChoices
+    });
+  }
+
+  checkChoice(choice) {
+    this.setState({
+      result: choice,
+      smartChoices: null
     });
   }
 
@@ -214,12 +225,6 @@ class Question extends Component {
     const questionId = children.length + 1;
     // compare with existing choice
     let choiceId = 100 + choices.length + 1;
-    choices.forEach(item => {
-      if (item.title === result) {
-        choiceId = item.id;
-      }
-    });
-
     // props method
     const { createQuestion, updateOption, currentItem } = this.props;
     const { pindex, index } = !_.isEmpty(args)
@@ -245,6 +250,10 @@ class Question extends Component {
         });
         break;
       case "resultSubmit":
+        if (result === "" || result === null) {
+          alert("输入不能为空");
+          return;
+        }
         const { createAnswer } = this.props;
         if (pindex !== -1 && index !== -1) {
           currentItem.children[pindex].children[index].focus = true;
@@ -259,7 +268,7 @@ class Question extends Component {
 
   componentDidMount = () => {
     const { currentItem } = this.props;
-    const { children } = currentItem;
+    const { children, choices } = currentItem;
     if (!children) {
       this.setState({
         add: true
@@ -268,8 +277,8 @@ class Question extends Component {
       children.forEach(item => {
         item.children.forEach(choiceItem => {
           if (choiceItem.target && choiceItem.target !== 0) {
-            if (choiceItem.target > 100) {
-              choiceItem.dest = this.props.currentItem.choices.filter(
+            if (choiceItem.target > 100 && _.isArray(choices)) {
+              choiceItem.dest = choices.filter(
                 item => item.id === choiceItem.target
               )[0].title;
             }
@@ -292,12 +301,14 @@ class Question extends Component {
     const handleInput = this.handleInput.bind(this);
     const handleBlur = this.handleBlur.bind(this);
     const handleSubmit = this.handleSubmit.bind(this);
+    const checkChoice = this.checkChoice.bind(this);
     const { smartChoices, position } = this.state;
     const events = {
       handleFocus,
       handleInput,
       handleBlur,
-      handleSubmit
+      handleSubmit,
+      checkChoice
     };
     // add the title text for children.children
     if (children) {

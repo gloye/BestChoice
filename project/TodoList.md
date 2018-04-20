@@ -26,6 +26,6 @@ cond3(no)->c1->e
 - [ ] option update
   - [x] disabled next button when the elment isn't empty
   - [ ] choose a option
-  - [ ] submit a option
-    - [ ] check the option
+  - [x] submit a option
+    - [x] check the option
   - [x] show the value in input element
