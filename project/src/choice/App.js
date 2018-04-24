@@ -103,22 +103,22 @@ class App extends PureComponent {
     const { index, pindex, target, result } = o;
     const currentItem = _.cloneDeep(this.state.currentItem);
     let { choices } = currentItem;
-    if (!_.isArray(choices)) {
+    if (!_.isArray(choices)||_.isEmpty(choices)) {
       choices = [];
+      const choice = {
+        title: result,
+        id: choices.length + 101
+      };
+      currentItem.children[pindex].children[index].target = target;
+      choices.push(choice);
+    } else {
+      choices.forEach(item => {
+        if (item.title === result) {
+          const choiceId = item.id;
+          currentItem.children[pindex].children[index].target = choiceId;
+        }
+      });
     }
-    choices.forEach(item => {
-      if (item.title === result) {
-        const choiceId = item.id;
-        currentItem.children[pindex].children[index].target = choiceId;
-      }else{
-        const choice = {
-          title: result,
-          id: choices.length + 101
-        };
-        currentItem.children[pindex].children[index].target = target;
-        choices.push(choice);
-      }
-    });
     currentItem.choices = choices;
     this.setState({ currentItem });
     alert("提交成功");
