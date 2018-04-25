@@ -4,21 +4,35 @@ body {
   font-family: sans-serif;
 }
 
-ul{
-  margin:0;
-  padding:0;
+.autoList {
+  margin: 0;
+  padding: 0;
   list-style: none;
   position: absolute;
-  left:0;
-  top:100%;
-  background-color:#fff;
-  width:240px;
-  padding:10px 0;
-  border:1px solid #ccc;
+  left: 0;
+  top: 100%;
+  background-color: #fff;
+  width: 240px;
+  padding: 10px 0;
+  border: 1px solid #ccc;
   z-index: 1;
 }
 
-li:hover{
-  background:#ddd;
-  color:#fff;
+.autoList-item:hover {
+  background: #ddd;
+  color: #fff;
+}
+
+.container {
+  width: 1070px;
+  margin: 0 auto;
+}
+
+.pre {
+  float: right;
+  margin: 0;
+  padding: 10px 15px;
+  height: 400px;
+  overflow-y: auto;
+  background-color: #eee;
 }

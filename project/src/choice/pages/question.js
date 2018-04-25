@@ -70,8 +70,8 @@ function Choice(props) {
       <input
         type="text"
         className="optionInput"
-        placeholder={props.value}
-        onChange={e => props.handleInput(e)}
+        value={props.value||""}
+        onChange={e => props.handleInput(e,{index,pindex})}
       />
 
       <button
@@ -87,7 +87,7 @@ function Choice(props) {
         <input
           type="text"
           className="resultInput"
-          placeholder={props.dest}
+          value={props.dest||""}
           onBlur={e => {
             props.handleBlur(e);
           }}
@@ -115,7 +115,7 @@ function SmartChoices(props) {
   if (_.isArray(choices) && !_.isEmpty(choices)) {
     choices.map((item, i) =>
       options.push(
-        <li key={i} onClick={props.checkOption}>
+        <li className="autoList-item" key={i} onClick={props.checkOption}>
           {item.title}
         </li>
       )
@@ -123,7 +123,7 @@ function SmartChoices(props) {
   } else {
     return null;
   }
-  return <ul>{options}</ul>;
+  return <ul className="autoList">{options}</ul>;
 }
 
 /* 然后开始建第一个选项 */
@@ -159,25 +159,26 @@ class Question extends Component {
 
   /* 输入 */
   handleInput(e, ...args) {
-    const { className } = e.target;
+    const { className, value } = e.target;
     const { pindex, index } = !_.isEmpty(args)
       ? args[0]
       : { pindex: -1, index: -1 };
     const position = [pindex, index];
+    const currentItem = _.cloneDeep(this.props.currentItem);
     switch (className) {
       case "questionInput":
-        const title = e.target.value;
-        this.setState({ title });
+        this.setState({ title: value });
         break;
       case "optionInput":
-        const option = e.target.value;
-        this.setState({ option });
+        currentItem.children[pindex].children[index].title = value
+        this.setState({ option: value, currentItem });
         break;
       case "resultInput":
-        const result = e.target.value;
-        this.smartType(result);
+        currentItem.children[pindex].children[index].dest = value;
+        this.smartType(value);
         this.setState({
-          result,
+          result: value,
+          currentItem,
           position //choice的位置
         });
         break;
@@ -326,11 +327,11 @@ class Question extends Component {
       });
     }
     return (
-      <div className="question-item">
+      <div className="container">
+        <pre className="pre">{JSON.stringify(currentItem, null, 2)}</pre>
         <h1>{title ? title : "尚未定义主题"}</h1>
         {Questions}
         {this.state.add ? <QuestionAdd index={nextIndex} {...events} /> : null}
-        <pre>{JSON.stringify(currentItem)}</pre>
       </div>
     );
   }

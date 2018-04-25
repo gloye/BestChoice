@@ -7,6 +7,23 @@ import Topic from "./pages/topic";
 import Question from "./pages/question";
 import Choice from "./pages/choice";
 
+const Nav = () => (
+  <div>
+    <ul>
+      <li>
+        <Link to="/topic" onClick={this.createApp}>
+          创建问卷
+        </Link>
+      </li>
+      <li>
+        <Link to="/question"> 查看上次记录 </Link>
+      </li>
+    </ul>
+  </div>
+);
+
+const NotFound = () => <h1>404 Not Found</h1>;
+
 class App extends PureComponent {
   constructor(props) {
     super(props);
@@ -89,7 +106,7 @@ class App extends PureComponent {
     localforage.setItem("currentItem", currentItem);
   }
 
-  /* 清除结果 */
+  /* degbugger模式: 清除现有的result */
   clearChoices() {
     const currentItem = _.cloneDeep(this.state.currentItem);
     currentItem.choices = null;
@@ -98,24 +115,26 @@ class App extends PureComponent {
     alert("清除成功");
   }
 
-  /* 新建一个结果 */
+  /* 新增一个结果 */
   createAnswer(o) {
     const { index, pindex, target, result } = o;
     const currentItem = _.cloneDeep(this.state.currentItem);
     let { choices } = currentItem;
-    if (!_.isArray(choices)||_.isEmpty(choices)) {
+    if (!_.isArray(choices) || _.isEmpty(choices)) {
       choices = [];
       const choice = {
         title: result,
         id: choices.length + 101
       };
       currentItem.children[pindex].children[index].target = target;
+      delete currentItem.children[pindex].children[index].focus;
       choices.push(choice);
     } else {
       choices.forEach(item => {
         if (item.title === result) {
           const choiceId = item.id;
           currentItem.children[pindex].children[index].target = choiceId;
+          delete currentItem.children[pindex].children[index].focus;
         }
       });
     }
@@ -127,15 +146,6 @@ class App extends PureComponent {
 
   render() {
     const { currentItem } = this.state;
-    const Nav = () => (
-      <div>
-        <Link to="/topic" onClick={this.createApp}>
-          创建问卷
-        </Link>
-        <button onClick={() => this.clearChoices()}>清除所有结果</button>
-      </div>
-    );
-    const NotFound = () => <h1>404 Not Found</h1>;
     if (!currentItem) {
       return <div>加载中</div>;
     } else {
