@@ -131,6 +131,7 @@ class Question extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      currentItem: props.currentItem,
       title: null, // 用于提交标题赋值
       option: null, // 用于提交选项赋值
       result: null, // 用于提交结果赋值
@@ -171,7 +172,7 @@ class Question extends Component {
         break;
       case "optionInput":
         currentItem.children[pindex].children[index].title = value
-        this.setState({ option: value, currentItem });
+        this.setState({ option: value,currentItem});
         break;
       case "resultInput":
         currentItem.children[pindex].children[index].dest = value;
@@ -187,7 +188,7 @@ class Question extends Component {
     }
   }
 
-  /* 智能提示 */
+  /* 自动完成 */
   smartType(inputVal) {
     let { choices } = this.props.currentItem;
     if (!_.isArray(choices)) return;
@@ -251,10 +252,6 @@ class Question extends Component {
         });
         break;
       case "resultSubmit":
-        if (result === "" || result === null) {
-          alert("输入不能为空");
-          return;
-        }
         const { createAnswer } = this.props;
         if (pindex !== -1 && index !== -1) {
           currentItem.children[pindex].children[index].focus = true;
@@ -268,7 +265,7 @@ class Question extends Component {
   }
 
   componentDidMount = () => {
-    const { currentItem } = this.props;
+    const { currentItem } = this.state;
     const { children, choices } = currentItem;
     if (!children) {
       this.setState({
@@ -293,8 +290,17 @@ class Question extends Component {
     }
   };
 
+  componentWillReceiveProps = (nextProps) => {
+    const {currentItem} = nextProps
+    this.setState({
+      currentItem
+    })
+  }
+  
+  
+
   render() {
-    const { currentItem } = this.props;
+    const { currentItem } = this.state;
     const { title, children } = currentItem;
     const Questions = [];
     const nextIndex = children ? children.length + 1 : 1;

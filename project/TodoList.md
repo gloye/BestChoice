@@ -29,3 +29,5 @@ cond3(no)->c1->e
   - [x] submit a option
     - [x] check the option
   - [x] show the value in input element
+- [x] enable change input's value
+- [ ] change the statu when clear the choice for each item

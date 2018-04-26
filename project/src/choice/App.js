@@ -39,7 +39,7 @@ class App extends PureComponent {
       .getItem("currentItem")
       .then(data => {
         if (!!data) {
-          this.setState({ currentItem: data });
+          this.upadateData(data);
         } else {
           this.createApp();
         }
@@ -79,8 +79,7 @@ class App extends PureComponent {
     };
     children.push(child);
     currentItem.children = children;
-    this.setState({ currentItem });
-    localforage.setItem("currentItem", currentItem);
+    this.upadateData(currentItem);
   }
 
   /* 初始化选项 */
@@ -96,23 +95,19 @@ class App extends PureComponent {
     return options;
   }
 
+  /* 更新数据 */
+  upadateData(data) {
+    this.setState({ currentItem: data });
+    localforage.setItem("currentItem", data);
+  }
+
   /* 更改默认选项 */
   updateOption(o) {
     const { index, pindex, option, target } = o;
     const currentItem = _.cloneDeep(this.state.currentItem);
     if (option) currentItem.children[pindex].children[index].title = option;
     currentItem.children[pindex].children[index].target = target;
-    this.setState({ currentItem });
-    localforage.setItem("currentItem", currentItem);
-  }
-
-  /* degbugger模式: 清除现有的result */
-  clearChoices() {
-    const currentItem = _.cloneDeep(this.state.currentItem);
-    currentItem.choices = null;
-    this.setState({ currentItem });
-    localforage.setItem("currentItem", currentItem);
-    alert("清除成功");
+    this.upadateData(currentItem);
   }
 
   /* 新增一个结果 */
@@ -122,13 +117,18 @@ class App extends PureComponent {
     let { choices } = currentItem;
     if (!_.isArray(choices) || _.isEmpty(choices)) {
       choices = [];
-      const choice = {
-        title: result,
-        id: choices.length + 101
-      };
-      currentItem.children[pindex].children[index].target = target;
+      if (result === "") {
+        currentItem.children[pindex].children[index].target = "";
+        delete currentItem.children[pindex].children[index].dest;
+      } else {
+        currentItem.children[pindex].children[index].target = target;
+        const choice = {
+          title: result,
+          id: choices.length + 101
+        };
+        choices.push(choice);
+      }
       delete currentItem.children[pindex].children[index].focus;
-      choices.push(choice);
     } else {
       choices.forEach(item => {
         if (item.title === result) {
@@ -139,9 +139,8 @@ class App extends PureComponent {
       });
     }
     currentItem.choices = choices;
-    this.setState({ currentItem });
     alert("提交成功");
-    localforage.setItem("currentItem", currentItem);
+    this.upadateData(currentItem);
   }
 
   render() {
