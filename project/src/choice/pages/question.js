@@ -70,8 +70,8 @@ function Choice(props) {
       <input
         type="text"
         className="optionInput"
-        value={props.value||""}
-        onChange={e => props.handleInput(e,{index,pindex})}
+        value={props.value || ""}
+        onChange={e => props.handleInput(e, { index, pindex })}
       />
 
       <button
@@ -87,7 +87,7 @@ function Choice(props) {
         <input
           type="text"
           className="resultInput"
-          value={props.dest||""}
+          value={props.dest || ""}
           onBlur={e => {
             props.handleBlur(e);
           }}
@@ -171,8 +171,8 @@ class Question extends Component {
         this.setState({ title: value });
         break;
       case "optionInput":
-        currentItem.children[pindex].children[index].title = value
-        this.setState({ option: value,currentItem});
+        currentItem.children[pindex].children[index].title = value;
+        this.setState({ option: value, currentItem });
         break;
       case "resultInput":
         currentItem.children[pindex].children[index].dest = value;
@@ -191,7 +191,7 @@ class Question extends Component {
   /* 自动完成 */
   smartType(inputVal) {
     let { choices } = this.props.currentItem;
-    if (!_.isArray(choices)) return;
+    if (!_.isArray(choices) || _.isEmpty(choices)) return;
     const filterMethod = item =>
       item.title.includes(inputVal) && inputVal !== "";
     const smartChoices = choices.filter(filterMethod);
@@ -228,7 +228,7 @@ class Question extends Component {
     // compare with existing choice
     let choiceId = 100 + choices.length + 1;
     // props method
-    const { createQuestion, updateOption, currentItem } = this.props;
+    const { createQuestion, updateOption } = this.props;
     const { pindex, index } = !_.isEmpty(args)
       ? args[0]
       : { pindex: -1, index: -1 };
@@ -253,9 +253,6 @@ class Question extends Component {
         break;
       case "resultSubmit":
         const { createAnswer } = this.props;
-        if (pindex !== -1 && index !== -1) {
-          currentItem.children[pindex].children[index].focus = true;
-        }
         const resultObj = Object.assign({ result }, obj);
         createAnswer(resultObj);
         break;
@@ -264,8 +261,8 @@ class Question extends Component {
     }
   }
 
-  componentDidMount = () => {
-    const { currentItem } = this.state;
+  createDest(data){
+    const currentItem = arguments.length>0?data:this.state.currentItem;
     const { children, choices } = currentItem;
     if (!children) {
       this.setState({
@@ -288,16 +285,16 @@ class Question extends Component {
         currentItem
       });
     }
+  }
+
+  componentDidMount = () => {
+    this.createDest()
   };
 
-  componentWillReceiveProps = (nextProps) => {
-    const {currentItem} = nextProps
-    this.setState({
-      currentItem
-    })
-  }
-  
-  
+  componentWillReceiveProps = nextProps => {
+    const { currentItem } = nextProps;
+    this.createDest(currentItem)
+  };
 
   render() {
     const { currentItem } = this.state;
@@ -334,10 +331,17 @@ class Question extends Component {
     }
     return (
       <div className="container">
-        <pre className="pre">{JSON.stringify(currentItem, null, 2)}</pre>
-        <h1>{title ? title : "尚未定义主题"}</h1>
-        {Questions}
-        {this.state.add ? <QuestionAdd index={nextIndex} {...events} /> : null}
+        <div className="debug">
+          <pre className="pre">{JSON.stringify(currentItem, null, 2)}</pre>
+          <button onClick={this.props.clearResults}>清除结果</button>
+        </div>
+        <div className="main">
+          <h1>{title ? title : "尚未定义主题"}</h1>
+          {Questions}
+          {this.state.add ? (
+            <QuestionAdd index={nextIndex} {...events} />
+          ) : null}
+        </div>
       </div>
     );
   }

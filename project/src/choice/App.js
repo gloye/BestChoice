@@ -7,7 +7,7 @@ import Topic from "./pages/topic";
 import Question from "./pages/question";
 import Choice from "./pages/choice";
 
-const Nav = () => (
+const Nav = props => (
   <div>
     <ul>
       <li>
@@ -115,31 +115,41 @@ class App extends PureComponent {
     const { index, pindex, target, result } = o;
     const currentItem = _.cloneDeep(this.state.currentItem);
     let { choices } = currentItem;
-    if (!_.isArray(choices) || _.isEmpty(choices)) {
-      choices = [];
-      if (result === "") {
-        currentItem.children[pindex].children[index].target = "";
-        delete currentItem.children[pindex].children[index].dest;
-      } else {
-        currentItem.children[pindex].children[index].target = target;
-        const choice = {
-          title: result,
-          id: choices.length + 101
-        };
-        choices.push(choice);
-      }
+    choices = _.isArray(choices) && !_.isEmpty(choices) ? choices : [];
+    // 提交一个空值时的逻辑 或者 先检测 choices
+    if (result === null || result === "") {
+      // 删除target  删除 dest 删除 focus 状态重置
+      delete currentItem.children[pindex].children[index].target;
+      delete currentItem.children[pindex].children[index].dest;
       delete currentItem.children[pindex].children[index].focus;
     } else {
-      choices.forEach(item => {
-        if (item.title === result) {
-          const choiceId = item.id;
-          currentItem.children[pindex].children[index].target = choiceId;
-          delete currentItem.children[pindex].children[index].focus;
+      let push = true;
+      // 在choices中进行排除
+      for (let i = 0; i < choices.length; i++) {
+        if (choices[i].title === result) {
+          currentItem.children[pindex].children[index].target = choices[i].id;
+          push = false;
+          break;
         }
-      });
+      }
+      // 添加一个新选项
+      if (push) {
+        const choice = {
+          title: result,
+          id: target
+        };
+        choices.push(choice);
+        currentItem.children[pindex].children[index].target = target;
+      }
     }
     currentItem.choices = choices;
     alert("提交成功");
+    this.upadateData(currentItem);
+  }
+
+  clearResults() {
+    const currentItem = _.cloneDeep(this.state.currentItem);
+    currentItem.choices = [];
     this.upadateData(currentItem);
   }
 
@@ -169,6 +179,9 @@ class App extends PureComponent {
                     createQuestion={q => this.createQuestion(q)}
                     createAnswer={a => this.createAnswer(a)}
                     updateOption={o => this.updateOption(o)}
+                    clearResults={() => {
+                      this.clearResults();
+                    }}
                     {...props}
                   />
                 )}

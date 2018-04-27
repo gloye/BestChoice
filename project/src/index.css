@@ -29,10 +29,14 @@ body {
 }
 
 .pre {
-  float: right;
   margin: 0;
   padding: 10px 15px;
   height: 400px;
   overflow-y: auto;
   background-color: #eee;
+}
+
+.debug{
+  float:right;
+  width:500px;
 }
