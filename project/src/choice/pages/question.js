@@ -261,8 +261,8 @@ class Question extends Component {
     }
   }
 
-  createDest(data){
-    const currentItem = arguments.length>0?data:this.state.currentItem;
+  createDest(data) {
+    const currentItem = arguments.length > 0 ? data : this.state.currentItem;
     const { children, choices } = currentItem;
     if (!children) {
       this.setState({
@@ -273,9 +273,10 @@ class Question extends Component {
         item.children.forEach(choiceItem => {
           if (choiceItem.target && choiceItem.target !== 0) {
             if (choiceItem.target > 100 && _.isArray(choices)) {
-              choiceItem.dest = choices.filter(
+              const filtered = choices.filter(
                 item => item.id === choiceItem.target
-              )[0].title;
+              );
+              if (!_.isEmpty(filtered)) currentItem.dest = filtered[0].title;
             }
           }
         });
@@ -288,12 +289,12 @@ class Question extends Component {
   }
 
   componentDidMount = () => {
-    this.createDest()
+    this.createDest();
   };
 
   componentWillReceiveProps = nextProps => {
     const { currentItem } = nextProps;
-    this.createDest(currentItem)
+    this.createDest(currentItem);
   };
 
   render() {
