@@ -13,7 +13,7 @@ function QuestionItem(props) {
         checkChoice={props.checkChoice}
         value={item.title}
         dest={item.dest}
-        pindex={props.index}
+        pIndex={props.index}
         index={i}
         key={i}
         isCurrent={props.index === props.position[0] && i === props.position[1]}
@@ -58,7 +58,7 @@ function QuestionAdd(props) {
 }
 
 function Choice(props) {
-  const { index, pindex, isCurrent } = props;
+  const { index, pIndex, isCurrent } = props;
   const inputTip = isCurrent ? (
     <SmartChoices
       choices={props.smartChoices}
@@ -71,14 +71,14 @@ function Choice(props) {
         type="text"
         className="optionInput"
         value={props.value || ""}
-        onChange={e => props.handleInput(e, { index, pindex })}
+        onChange={e => props.handleInput(e, { index, pIndex })}
       />
 
       <button
         className="optionSubmit"
         disabled={!!props.dest}
         onClick={e => {
-          props.handleSubmit(e, { index, pindex });
+          props.handleSubmit(e, { index, pIndex });
         }}
       >
         下一题
@@ -92,13 +92,13 @@ function Choice(props) {
             props.handleBlur(e);
           }}
           onChange={e => {
-            props.handleInput(e, { index, pindex });
+            props.handleInput(e, { index, pIndex });
           }}
         />
         <button
           className="resultSubmit"
           onClick={e => {
-            props.handleSubmit(e, { index, pindex });
+            props.handleSubmit(e, { index, pIndex });
           }}
         >
           提交
@@ -161,21 +161,21 @@ class Question extends Component {
   /* 输入 */
   handleInput(e, ...args) {
     const { className, value } = e.target;
-    const { pindex, index } = !_.isEmpty(args)
+    const { pIndex, index } = !_.isEmpty(args)
       ? args[0]
-      : { pindex: -1, index: -1 };
-    const position = [pindex, index];
+      : { pIndex: -1, index: -1 };
+    const position = [pIndex, index];
     const currentItem = _.cloneDeep(this.props.currentItem);
     switch (className) {
       case "questionInput":
         this.setState({ title: value });
         break;
       case "optionInput":
-        currentItem.children[pindex].children[index].title = value;
+        currentItem.children[pIndex].children[index].title = value;
         this.setState({ option: value, currentItem });
         break;
       case "resultInput":
-        currentItem.children[pindex].children[index].dest = value;
+        currentItem.children[pIndex].children[index].dest = value;
         this.smartType(value);
         this.setState({
           result: value,
@@ -229,10 +229,10 @@ class Question extends Component {
     let choiceId = 100 + choices.length + 1;
     // props method
     const { createQuestion, updateOption } = this.props;
-    const { pindex, index } = !_.isEmpty(args)
+    const { pIndex, index } = !_.isEmpty(args)
       ? args[0]
-      : { pindex: -1, index: -1 };
-    const targetId = this.checkPosition([pindex, index])
+      : { pIndex: -1, index: -1 };
+    const targetId = this.checkPosition([pIndex, index])
       ? choiceId
       : questionId;
     const obj = Object.assign({ target: targetId }, args[0]);

@@ -24,13 +24,13 @@ cond3(no)->c1->e
 ## Todo list
 
 * [x] option update
-  * [x] disabled next button when the elment isn't empty
+  * [x] disabled next button when the element isn't empty
   * [x] choose a option
   * [x] submit a option
     * [x] check the option
   * [x] show the value in input element
 * [x] enable change input's value
-* [x] change the statu when clear the choice for each item
+* [x] change the status when clear the choice for each item
 
 ## 项目的一些思考
 

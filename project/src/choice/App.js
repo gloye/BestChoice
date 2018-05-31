@@ -37,7 +37,7 @@ class App extends PureComponent {
       .getItem('currentItem')
       .then(data => {
         if (!!data) {
-          this.upadateData(data)
+          this.updateData(data)
         } else {
           this.createApp()
         }
@@ -77,7 +77,7 @@ class App extends PureComponent {
     }
     children.push(child)
     currentItem.children = children
-    this.upadateData(currentItem)
+    this.updateData(currentItem)
   }
 
   /* 初始化选项 */
@@ -94,38 +94,38 @@ class App extends PureComponent {
   }
 
   /* 更新数据 */
-  upadateData(data) {
+  updateData(data) {
     this.setState({ currentItem: data })
     lf.setItem('currentItem', data)
   }
 
   /* 更改默认选项 */
   updateOption(o) {
-    const { index, pindex, option, target } = o
+    const { index, pIndex, option, target } = o
     const currentItem = _.cloneDeep(this.state.currentItem)
-    if (option) currentItem.children[pindex].children[index].title = option
-    currentItem.children[pindex].children[index].target = target
-    this.upadateData(currentItem)
+    if (option) currentItem.children[pIndex].children[index].title = option
+    currentItem.children[pIndex].children[index].target = target
+    this.updateData(currentItem)
   }
 
   /* 新增一个结果 */
   createAnswer(o) {
-    const { index, pindex, target, result } = o
+    const { index, pIndex, target, result } = o
     const currentItem = _.cloneDeep(this.state.currentItem)
     let { choices } = currentItem
     choices = _.isArray(choices) && !_.isEmpty(choices) ? choices : []
     // 提交一个空值时的逻辑 或者 先检测 choices
     if (result === null || result === '') {
       // 删除target  删除 dest 删除 focus 状态重置
-      delete currentItem.children[pindex].children[index].target
-      delete currentItem.children[pindex].children[index].dest
-      delete currentItem.children[pindex].children[index].focus
+      delete currentItem.children[pIndex].children[index].target
+      delete currentItem.children[pIndex].children[index].dest
+      delete currentItem.children[pIndex].children[index].focus
     } else {
       let push = true
       // 在choices中进行排除
       for (let i = 0; i < choices.length; i++) {
         if (choices[i].title === result) {
-          currentItem.children[pindex].children[index].target = choices[i].id
+          currentItem.children[pIndex].children[index].target = choices[i].id
           push = false
           break
         }
@@ -137,18 +137,18 @@ class App extends PureComponent {
           id: target
         }
         choices.push(choice)
-        currentItem.children[pindex].children[index].target = target
+        currentItem.children[pIndex].children[index].target = target
       }
     }
     currentItem.choices = choices
     alert('提交成功')
-    this.upadateData(currentItem)
+    this.updateData(currentItem)
   }
 
   clearResults() {
     const currentItem = _.cloneDeep(this.state.currentItem)
     currentItem.choices = []
-    this.upadateData(currentItem)
+    this.updateData(currentItem)
   }
 
   render() {
