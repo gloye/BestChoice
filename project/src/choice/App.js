@@ -5,21 +5,22 @@ import { BrowserRouter as Router, Route, Link, Switch } from 'react-router-dom'
 
 import Topic from './pages/topic'
 import Question from './pages/question'
-import Choice from './pages/choice'
 
+// 导航栏
 const Nav = props => (
   <div>
     <ul>
       <li>
         <Link to="/topic"> 创建问卷 </Link>
       </li>
-      <li>
+     {/*  <li>
         <Link to="/question"> 查看上次记录 </Link>
-      </li>
+      </li> */}
     </ul>
   </div>
 )
 
+// 404
 const NotFound = () => <h1>404 Not Found</h1>
 
 class App extends PureComponent {
@@ -33,8 +34,7 @@ class App extends PureComponent {
 
   componentDidMount = () => {
     // 读取本地存储
-    lf
-      .getItem('currentItem')
+    lf.getItem('currentItem')
       .then(data => {
         if (!!data) {
           this.updateData(data)
@@ -145,6 +145,7 @@ class App extends PureComponent {
     this.updateData(currentItem)
   }
 
+  /* 删除结果 */
   clearResults() {
     const currentItem = _.cloneDeep(this.state.currentItem)
     currentItem.choices = []
@@ -177,14 +178,11 @@ class App extends PureComponent {
                     createQuestion={q => this.createQuestion(q)}
                     createAnswer={a => this.createAnswer(a)}
                     updateOption={o => this.updateOption(o)}
-                    clearResults={() => {
-                      this.clearResults()
-                    }}
+                    clearResults={() => this.clearResults}
                     {...props}
                   />
                 )}
               />
-              <Route path="/choice" component={Choice} />
               <Route exact path="/" component={Nav} />
               <Route component={NotFound} />
             </Switch>
