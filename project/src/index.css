@@ -1,7 +1,18 @@
+html,
+body {
+  height: 100%;
+}
 body {
   margin: 0;
   padding: 0;
   font-family: sans-serif;
+  background-color: #efefef;
+}
+
+#root {
+  padding: 15px;
+  margin:15px;
+  background-color: #fff;
 }
 
 .autoList {
@@ -23,11 +34,6 @@ body {
   color: #fff;
 }
 
-.container {
-  width: 1070px;
-  margin: 0 auto;
-}
-
 .pre {
   margin: 0;
   padding: 10px 15px;
@@ -36,7 +42,7 @@ body {
   background-color: #eee;
 }
 
-.debug{
-  float:right;
-  width:500px;
+.debug {
+  float: right;
+  width: 500px;
 }
