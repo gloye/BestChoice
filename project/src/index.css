@@ -2,6 +2,7 @@ html,
 body {
   height: 100%;
 }
+
 body {
   margin: 0;
   padding: 0;
@@ -9,10 +10,10 @@ body {
   background-color: #efefef;
 }
 
-#root {
-  padding: 15px;
-  margin:15px;
-  background-color: #fff;
+ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
 }
 
 .autoList {
