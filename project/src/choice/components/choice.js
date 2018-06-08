@@ -51,3 +51,5 @@ const Choice = props => {
     </div>
   )
 }
+
+export default Choice

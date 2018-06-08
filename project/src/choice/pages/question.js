@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import _ from 'lodash'
 import QuestionItem from '../components/questionItem'
-
+import QuestionAdd from '../components/questionAdd'
 
 /* 然后开始建第一个选项 */
 class Question extends Component {
