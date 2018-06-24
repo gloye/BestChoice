@@ -335,7 +335,7 @@ class Question extends Component {
           <pre className="pre">{JSON.stringify(currentItem, null, 2)}</pre>
           <button onClick={this.props.clearResults}>清除结果</button>
         </div> */}
-        <div className="main">
+        <div className="card">
           <h3>{title}</h3>
           {Questions}
           {this.state.add ? (

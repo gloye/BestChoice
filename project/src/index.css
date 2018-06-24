@@ -9,12 +9,6 @@ body {
   background-color: #efefef;
 }
 
-#root {
-  padding: 15px;
-  margin:15px;
-  background-color: #fff;
-}
-
 .autoList {
   margin: 0;
   padding: 0;
