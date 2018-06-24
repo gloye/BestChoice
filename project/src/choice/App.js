@@ -8,13 +8,13 @@ import Question from './pages/question'
 
 // 导航栏
 const Nav = props => (
-  <div>
-    <ul>
+  <div className="card">
+    <ul className="card-body">
       <li>
-        <Link to="/topic"> 创建问卷 </Link>
+        <Link to="/topic" className="btn btn-primary btn-block"> 创建问卷 </Link>
       </li>
      {/*  <li>
-        <Link to="/question"> 查看上次记录 </Link>
+        <Link to="/question"  className="btn btn-primary btn-block"> 查看上次记录 </Link>
       </li> */}
     </ul>
   </div>
